@@ -62,15 +62,15 @@ enum class KeyCode : int32_t
 {
   kFailed = -1,
   kOK = 0,
-  kStatusBusy = 1,
-  kStatusUninitialized = 2,
+  kStateInvalid = 1,
+  kStatusBusy = 2,
   kStatusError = 3,
   kNetError = 4,
   kPermissionDenied = 5,
   kTimeout = 6,
   kUnSupport = 7,
   kSelfCheckFailed = 8,
-  kInvalidParameters = 9,
+  kParametersInvalid = 9,
 };  // enum class KeyCode
 
 
