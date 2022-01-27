@@ -34,6 +34,7 @@ namespace cyberdog
 // using namespace rapidjson;
 namespace common
 {
+  using namespace rapidjson;
 class CyberdogJson
 {
 public:
@@ -42,130 +43,130 @@ public:
 
 public:
   /* construct json data */
-  static void AddJsonKey(rapidjson::Document & doc, const std::string keyName, const int value)
+  static void Add(Document & doc, const std::string keyName, const int value)
   {
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetInt(value);
     } else {
-      rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
-      rapidjson::Value key(keyName.c_str(), allocator);
-      rapidjson::Value val(value);
+      Document::AllocatorType & allocator = doc.GetAllocator();
+      Value key(keyName.c_str(), allocator);
+      Value val(value);
       doc.AddMember(key, val, allocator);
     }
   }
 
-  static void AddJsonKey(rapidjson::Document & doc, const std::string keyName, const uint64_t value)
+  static void Add(Document & doc, const std::string keyName, const uint64_t value)
   {
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetUint64(value);
     } else {
-      rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
-      rapidjson::Value key(keyName.c_str(), allocator);
-      rapidjson::Value val(value);
+      Document::AllocatorType & allocator = doc.GetAllocator();
+      Value key(keyName.c_str(), allocator);
+      Value val(value);
       doc.AddMember(key, val, allocator);
     }
   }
 
-  static void AddJsonKey(rapidjson::Document & doc, const std::string keyName, const double value)
+  static void Add(Document & doc, const std::string keyName, const double value)
   {
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetDouble(value);
     } else {
-      rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
-      rapidjson::Value key(keyName.c_str(), allocator);
-      rapidjson::Value val(value);
+      Document::AllocatorType & allocator = doc.GetAllocator();
+      Value key(keyName.c_str(), allocator);
+      Value val(value);
       doc.AddMember(key, val, allocator);
     }
   }
 
-  static void AddJsonKey(rapidjson::Document & doc, const std::string keyName, const float value)
+  static void Add(Document & doc, const std::string keyName, const float value)
   {
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetFloat(value);
     } else {
-      rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
-      rapidjson::Value key(keyName.c_str(), allocator);
-      rapidjson::Value val(value);
+      Document::AllocatorType & allocator = doc.GetAllocator();
+      Value key(keyName.c_str(), allocator);
+      Value val(value);
       doc.AddMember(key, val, allocator);
     }
   }
 
-  static void AddJsonKey(
-    rapidjson::Document & doc, const std::string keyName,
+  static void Add(
+    Document & doc, const std::string keyName,
     const std::string value)
   {
-    rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
+    Document::AllocatorType & allocator = doc.GetAllocator();
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetString(value.c_str(), value.length(), allocator);
     } else {
-      rapidjson::Value key(keyName.c_str(), allocator);
-      rapidjson::Value val;
+      Value key(keyName.c_str(), allocator);
+      Value val;
       val.SetString(value.c_str(), value.length(), allocator);
       doc.AddMember(key, val, allocator);
     }
   }
 
-  static void AddJsonKey(rapidjson::Document & doc, const std::string keyName, const char * value)
+  static void Add(Document & doc, const std::string keyName, const char * value)
   {
-    rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
+    Document::AllocatorType & allocator = doc.GetAllocator();
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetString(value, strlen(value), allocator);
     } else {
-      rapidjson::Value key(keyName.c_str(), allocator);
-      rapidjson::Value val;
+      Value key(keyName.c_str(), allocator);
+      Value val;
       val.SetString(value, strlen(value), allocator);
       doc.AddMember(key, val, allocator);
     }
   }
 
-  static void AddJsonKey(rapidjson::Document & doc, const std::string keyName, const bool value)
+  static void Add(Document & doc, const std::string keyName, const bool value)
   {
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetBool(value);
     } else {
-      rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
-      rapidjson::Value key(keyName.c_str(), allocator);
-      rapidjson::Value val(value);
+      Document::AllocatorType & allocator = doc.GetAllocator();
+      Value key(keyName.c_str(), allocator);
+      Value val(value);
       doc.AddMember(key, val, allocator);
     }
   }
 
-  static void AddJsonKey(
-    rapidjson::Document & doc, const std::string keyName,
-    rapidjson::Document & value)
+  static void Add(
+    Document & doc, const std::string keyName,
+    Document & value)
   {
-    rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
+    Document::AllocatorType & allocator = doc.GetAllocator();
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].CopyFrom(value, allocator);
     } else {
-      rapidjson::Document val;
+      Document val;
       val.CopyFrom(value, allocator);
-      rapidjson::Value key(keyName.c_str(), allocator);
+      Value key(keyName.c_str(), allocator);
       doc.AddMember(key, val, allocator);
     }
   }
 
-  static void AddJsonKey(
-    rapidjson::Document & doc, const std::string keyName,
-    rapidjson::Value & value)
+  static void Add(
+    Document & doc, const std::string keyName,
+    Value & value)
   {
-    rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
+    Document::AllocatorType & allocator = doc.GetAllocator();
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].CopyFrom(value, allocator);
     } else {
-      rapidjson::Value val;
+      Value val;
       val.CopyFrom(value, allocator);
-      rapidjson::Value key(keyName.c_str(), allocator);
+      Value key(keyName.c_str(), allocator);
       doc.AddMember(key, val, allocator);
     }
   }
 
-  static bool AddJsonKey(rapidjson::Document & doc, rapidjson::Document & value)
+  static bool Add(Document & doc, Document & value)
   {
     bool ret = true;
-    rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
+    Document::AllocatorType & allocator = doc.GetAllocator();
     if (doc.IsArray()) {
-      static rapidjson::Document val(rapidjson::kObjectType);
+      static Document val(kObjectType);
       val.CopyFrom(value, allocator);
       doc.PushBack(val, allocator);
     } else {
@@ -175,12 +176,12 @@ public:
     return ret;
   }
 
-  static bool AddJsonKey(rapidjson::Document & doc, rapidjson::Value & value)
+  static bool Add(Document & doc, Value & value)
   {
     bool ret = true;
-    rapidjson::Document::AllocatorType & allocator = doc.GetAllocator();
+    Document::AllocatorType & allocator = doc.GetAllocator();
     if (doc.IsArray()) {
-      static rapidjson::Value val(rapidjson::kObjectType);
+      static Value val(kObjectType);
       val.CopyFrom(value, allocator);
       doc.PushBack(val, allocator);
     } else {
@@ -192,7 +193,7 @@ public:
 
 public:
   /* convert json data */
-  static bool String2Document(const std::string str, rapidjson::Document & doc)
+  static bool String2Document(const std::string & str, Document & doc)
   {
     bool ret = true;
     if (str.empty()) {
@@ -208,33 +209,33 @@ public:
     return ret;
   }
 
-  static bool Document2String(const rapidjson::Document & doc, std::string & str)
+  static bool Document2String(const Document & doc, std::string & str)
   {
     if (!doc.IsObject() && !doc.IsArray()) {
       return false;
     }
 
-    rapidjson::StringBuffer s;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+    StringBuffer s;
+    Writer<StringBuffer> writer(s);
     doc.Accept(writer);
 
     str = std::string(s.GetString());
     return true;
   }
 
-  static void Value2String(rapidjson::Value & val, std::string & valStr)
+  static void Value2String(Value & val, std::string & valStr)
   {
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
     val.Accept(writer);
     valStr = buffer.GetString();
   }
 
-  static bool Value2Doc(rapidjson::Value & val, rapidjson::Document & doc)
+  static bool Value2Document(Value & val, Document & doc)
   {
     std::string valStr;
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
     val.Accept(writer);
     valStr = buffer.GetString();
     doc.Parse<0>(valStr.c_str());
@@ -246,7 +247,7 @@ public:
     }
   }
 
-  static bool ReadJsonFromFile(const std::string jsonFileName, rapidjson::Document * doc)
+  static bool ReadJsonFromFile(const std::string jsonFileName, Document * doc)
   {
     std::string jsonStr;
     doc->SetObject();
@@ -263,14 +264,14 @@ public:
     }
   }
 
-  static bool WriteJsonToFile(const std::string jsonFileName, rapidjson::Document * doc)
+  static bool WriteJsonToFile(const std::string jsonFileName, Document * doc)
   {
     bool ret = false;
     int fd = open(jsonFileName.c_str(), O_WRONLY | O_CREAT | O_SYNC | O_TRUNC, 0660);
     if (fd >= 0) {
-      rapidjson::StringBuffer buffer;
-      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-      writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+      StringBuffer buffer;
+      PrettyWriter<StringBuffer> writer(buffer);
+      writer.SetFormatOptions(kFormatSingleLineArray);
       doc->Accept(writer);
       std::string msg = buffer.GetString();
       int msg_size = msg.size();
@@ -312,8 +313,8 @@ private:
 
 public:
   /* parse json data */
-  static bool GetKeyValueSafety(
-    const rapidjson::Document & doc, const char * key,
+  static bool Get(
+    const Document & doc, const char * key,
     std::string & value)
   {
     if (!doc.HasMember(key) || !doc[key].IsString()) {
@@ -324,7 +325,7 @@ public:
     value = doc[key].GetString();
     return true;
   }
-  static bool GetKeyValueSafety(const rapidjson::Document & doc, const char * key, int & value)
+  static bool Get(const Document & doc, const char * key, int & value)
   {
     if (!doc.HasMember(key) || !doc[key].IsInt()) {
       return false;
@@ -335,7 +336,7 @@ public:
     }
     return true;
   }
-  static bool GetKeyValueSafety(const rapidjson::Document & doc, const char * key, uint64_t & value)
+  static bool Get(const Document & doc, const char * key, uint64_t & value)
   {
     if (!doc.HasMember(key) || !doc[key].IsUint64()) {
       return false;
@@ -344,9 +345,9 @@ public:
     value = doc[key].GetUint64();
     return true;
   }
-  static bool GetKeyValueSafety(
-    rapidjson::Document & doc, const char * key,
-    rapidjson::Value & value)
+  static bool Get(
+    Document & doc, const char * key,
+    Value & value)
   {
     if (!doc.HasMember(key)) {
       return false;
@@ -355,7 +356,7 @@ public:
     value.CopyFrom(doc[key], doc.GetAllocator());
     return true;
   }
-  static bool GetKeyValueSafety(const rapidjson::Document & doc, const char * key, float & value)
+  static bool Get(const Document & doc, const char * key, float & value)
   {
     if (!doc.HasMember(key) || !(doc[key].IsFloat() || doc[key].IsInt())) {
       return false;
@@ -369,7 +370,7 @@ public:
 
     return true;
   }
-  static bool GetKeyValueSafety(const rapidjson::Document & doc, const char * key, bool & value)
+  static bool Get(const Document & doc, const char * key, bool & value)
   {
     if (!doc.HasMember(key) || !doc[key].IsBool()) {
       return false;
@@ -378,7 +379,7 @@ public:
     value = doc[key].GetBool();
     return true;
   }
-  static bool GetKeyValueSafety(const rapidjson::Value & val, const char * key, std::string & value)
+  static bool Get(const Value & val, const char * key, std::string & value)
   {
     if (!val.HasMember(key) || !val[key].IsString()) {
       value = "parse error";
@@ -388,7 +389,7 @@ public:
     value = val[key].GetString();
     return true;
   }
-  static bool GetKeyValueSafety(const rapidjson::Value & val, const char * key, int & value)
+  static bool Get(const Value & val, const char * key, int & value)
   {
     if (!val.HasMember(key) || !val[key].IsInt()) {
       return false;
@@ -397,7 +398,7 @@ public:
     value = val[key].GetInt();
     return true;
   }
-  static bool GetKeyValueSafety(const rapidjson::Value & val, const char * key, bool & value)
+  static bool Get(const Value & val, const char * key, bool & value)
   {
     if (!val.HasMember(key) || !val[key].IsBool()) {
       return false;
