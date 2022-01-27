@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 3.8)
 project(cyberdog_common)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-  add_definitions(-Wclass-memaccess)
+  # 暂时使用-Wno-class-memaccess屏蔽掉rapidjson的编译警告
+  # 该警告来自于高等级(>=9)的gcc检查
+  add_compile_options(-Wall -Wextra -Wpedantic -Wno-class-memaccess)
 endif()
-add_definitions(-Wclass-memaccess)
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rapidjson REQUIRED)
@@ -24,7 +25,7 @@ if(BUILD_TESTING)
   ament_target_dependencies(jsontest rclcpp rapidjson)
   install(TARGETS
     jsontest
-    DESTINATION lib/${PROJECT_NAME})  
+    DESTINATION lib/${PROJECT_NAME})
   ament_lint_auto_find_test_dependencies()
 endif()
 
