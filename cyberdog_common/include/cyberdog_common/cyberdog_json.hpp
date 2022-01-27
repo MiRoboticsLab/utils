@@ -35,7 +35,7 @@ namespace cyberdog
 namespace common
 {
 using namespace rapidjson;
-class CyberdogJson
+class CyberdogJson final
 {
 public:
   CyberdogJson() {}
@@ -43,7 +43,7 @@ public:
 
 public:
   /* construct json data */
-  static void Add(Document & doc, const std::string keyName, const int value)
+  static void Add(Document & doc, const std::string & keyName, const int value)
   {
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetInt(value);
@@ -55,7 +55,7 @@ public:
     }
   }
 
-  static void Add(Document & doc, const std::string keyName, const uint64_t value)
+  static void Add(Document & doc, const std::string & keyName, const uint64_t value)
   {
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetUint64(value);
@@ -67,7 +67,7 @@ public:
     }
   }
 
-  static void Add(Document & doc, const std::string keyName, const double value)
+  static void Add(Document & doc, const std::string & keyName, const double value)
   {
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetDouble(value);
@@ -79,7 +79,7 @@ public:
     }
   }
 
-  static void Add(Document & doc, const std::string keyName, const float value)
+  static void Add(Document & doc, const std::string & keyName, const float value)
   {
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetFloat(value);
@@ -92,7 +92,7 @@ public:
   }
 
   static void Add(
-    Document & doc, const std::string keyName,
+    Document & doc, const std::string & keyName,
     const std::string value)
   {
     Document::AllocatorType & allocator = doc.GetAllocator();
@@ -106,7 +106,7 @@ public:
     }
   }
 
-  static void Add(Document & doc, const std::string keyName, const char * value)
+  static void Add(Document & doc, const std::string & keyName, const char * value)
   {
     Document::AllocatorType & allocator = doc.GetAllocator();
     if (doc.HasMember(keyName.c_str())) {
@@ -119,7 +119,7 @@ public:
     }
   }
 
-  static void Add(Document & doc, const std::string keyName, const bool value)
+  static void Add(Document & doc, const std::string & keyName, const bool value)
   {
     if (doc.HasMember(keyName.c_str())) {
       doc[keyName.c_str()].SetBool(value);
@@ -132,7 +132,7 @@ public:
   }
 
   static void Add(
-    Document & doc, const std::string keyName,
+    Document & doc, const std::string & keyName,
     Document & value)
   {
     Document::AllocatorType & allocator = doc.GetAllocator();
@@ -147,7 +147,7 @@ public:
   }
 
   static void Add(
-    Document & doc, const std::string keyName,
+    Document & doc, const std::string & keyName,
     Value & value)
   {
     Document::AllocatorType & allocator = doc.GetAllocator();
@@ -296,7 +296,7 @@ public:
   }
 
 private:
-  static bool ReadFile(const std::string jsonFileName, std::string & jsonStr)
+  static bool ReadFile(const std::string & jsonFileName, std::string & jsonStr)
   {
     bool ret = false;
     std::ifstream in_file;
@@ -325,6 +325,7 @@ public:
     value = doc[key].GetString();
     return true;
   }
+
   static bool Get(const Document & doc, const char * key, int & value)
   {
     if (!doc.HasMember(key) || !doc[key].IsInt()) {
@@ -336,6 +337,7 @@ public:
     }
     return true;
   }
+
   static bool Get(const Document & doc, const char * key, uint64_t & value)
   {
     if (!doc.HasMember(key) || !doc[key].IsUint64()) {
@@ -345,9 +347,8 @@ public:
     value = doc[key].GetUint64();
     return true;
   }
-  static bool Get(
-    Document & doc, const char * key,
-    Value & value)
+
+  static bool Get(Document & doc, const char * key, Value & value)
   {
     if (!doc.HasMember(key)) {
       return false;
@@ -356,6 +357,7 @@ public:
     value.CopyFrom(doc[key], doc.GetAllocator());
     return true;
   }
+
   static bool Get(const Document & doc, const char * key, float & value)
   {
     if (!doc.HasMember(key) || !(doc[key].IsFloat() || doc[key].IsInt())) {
@@ -370,6 +372,7 @@ public:
 
     return true;
   }
+
   static bool Get(const Document & doc, const char * key, bool & value)
   {
     if (!doc.HasMember(key) || !doc[key].IsBool()) {
@@ -379,6 +382,7 @@ public:
     value = doc[key].GetBool();
     return true;
   }
+
   static bool Get(const Value & val, const char * key, std::string & value)
   {
     if (!val.HasMember(key) || !val[key].IsString()) {
@@ -389,6 +393,7 @@ public:
     value = val[key].GetString();
     return true;
   }
+
   static bool Get(const Value & val, const char * key, int & value)
   {
     if (!val.HasMember(key) || !val[key].IsInt()) {
@@ -398,6 +403,7 @@ public:
     value = val[key].GetInt();
     return true;
   }
+
   static bool Get(const Value & val, const char * key, bool & value)
   {
     if (!val.HasMember(key) || !val[key].IsBool()) {
