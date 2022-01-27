@@ -6,9 +6,9 @@
  *        Should not be compiled in OTA or DailyBuild version
  * @version 0.1
  * @date 2022-01-26
- * 
+ *
  * @copyright Copyright (c) 2022.
- * 
+ *
  */
 #include <iostream>
 #include <algorithm>
@@ -28,8 +28,9 @@ TEST(rapidjson, basic_using)
   const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
   Document d;
   d.Parse<0>(json);
-  if(d.HasParseError())
+  if (d.HasParseError()) {
     return;
+  }
 
   EXPECT_TRUE(d.IsObject());
   EXPECT_TRUE(d["hello"].IsString());
@@ -52,8 +53,9 @@ TEST(rapidjson, copy)
   const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
   Document d;
   d.Parse<0>(json);
-  if(d.HasParseError())
+  if (d.HasParseError()) {
     return;
+  }
 
   EXPECT_TRUE(d.IsObject());
 
@@ -72,12 +74,14 @@ TEST(cyberdogjson, reader)
   std::cout << "hello cyberdogjson reader" << std::endl;
   const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
   Document d;
-  if(!CyberdogJson::String2Document(std::string(json), d))
+  if (!CyberdogJson::String2Document(std::string(json), d)) {
     return;
-  
+  }
+
   std::string hello;
-  if(! CyberdogJson::Get(d, "hello", hello))
+  if (!CyberdogJson::Get(d, "hello", hello)) {
     return;
+  }
   EXPECT_EQ(strcmp(hello.c_str(), "Cyberdog"), 0);
   // std::cout << "hello, " << hello << std::endl;
   EXPECT_FALSE(CyberdogJson::Get(d, "world", hello));
@@ -88,8 +92,9 @@ TEST(cyberdogjson, writer)
   std::cout << "hello cyberdogjson writer" << std::endl;
   const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
   Document d;
-  if(!CyberdogJson::String2Document(std::string(json), d))
+  if (!CyberdogJson::String2Document(std::string(json), d)) {
     return;
+  }
   CyberdogJson::Add(d, "project", "L91");
   EXPECT_TRUE(d.HasMember("project"));
   Value v(kObjectType);
@@ -105,11 +110,13 @@ TEST(cyberdogjson, serialize)
   std::cout << "hello cyberdogjson serialize" << std::endl;
   const char json[] = "{\"hello\":\"Cyberdog\",\"version\":\"Carpo\"}";
   Document d;
-  if(!CyberdogJson::String2Document(std::string(json), d))
+  if (!CyberdogJson::String2Document(std::string(json), d)) {
     return;
+  }
   std::string after;
-  if(!CyberdogJson::Document2String(d, after))
+  if (!CyberdogJson::Document2String(d, after)) {
     return;
+  }
   EXPECT_EQ(std::string(json), after);
 }
 
