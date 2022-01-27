@@ -15,7 +15,7 @@
 #define CYBERDOG_COMMON__CYBERDOG_JSON_HPP_
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h> 
+#include <fcntl.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <fstream>
@@ -34,7 +34,7 @@ namespace cyberdog
 // using namespace rapidjson;
 namespace common
 {
-  using namespace rapidjson;
+using namespace rapidjson;
 class CyberdogJson
 {
 public:
