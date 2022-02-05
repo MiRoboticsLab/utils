@@ -10,6 +10,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rapidjson REQUIRED)
+find_package(toml REQUIRED)
 find_package(rclcpp REQUIRED)
 
 install(DIRECTORY include/
@@ -18,15 +19,25 @@ install(DIRECTORY include/
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
-  set(TEST
-    test/json_test.cpp)
   include_directories(include)
-  ament_add_gtest(jsontest ${TEST})
+  ament_add_gtest(jsontest test/json_test.cpp)
+  ament_add_gtest(tomltest test/toml_test.cpp)
+  target_compile_definitions(tomltest PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
+  ament_target_dependencies(tomltest rclcpp toml)
   ament_target_dependencies(jsontest rclcpp rapidjson)
   install(TARGETS
-    jsontest
+    jsontest tomltest
     DESTINATION lib/${PROJECT_NAME})
+  # install(TARGETS
+  #   tomltest
+  #   DESTINATION lib/${PROJECT_NAME})
+  install(FILES
+    test/benchmark.toml
+    DESTINATION lib/${PROJECT_NAME})
+  # ament_export_files(benchmark.toml)
   ament_lint_auto_find_test_dependencies()
+  # set(filepath ${CMAKE_INSTALL_PREFIX})
+  # message(WARNING "${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
 endif()
 
 ament_export_include_directories(include)
