@@ -28,16 +28,10 @@ if(BUILD_TESTING)
   install(TARGETS
     jsontest tomltest
     DESTINATION lib/${PROJECT_NAME})
-  # install(TARGETS
-  #   tomltest
-  #   DESTINATION lib/${PROJECT_NAME})
   install(FILES
     test/benchmark.toml
     DESTINATION lib/${PROJECT_NAME})
-  # ament_export_files(benchmark.toml)
   ament_lint_auto_find_test_dependencies()
-  # set(filepath ${CMAKE_INSTALL_PREFIX})
-  # message(WARNING "${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
 endif()
 
 ament_export_include_directories(include)

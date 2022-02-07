@@ -31,27 +31,84 @@ public:
 
 public:
   /* Trans data between toml and file. */
-  static bool ParseFile(const std::string& file_name, toml::value & v)
+  static bool ParseFile(const std::string & file_name, toml::value & v)
   {
-    try
-    {
+    try {
       v = toml::parse(file_name);
       return true;
-    }
-    catch(const std::exception& e)
-    {
+    } catch (const std::exception & e) {
       std::cerr << e.what() << '\n';
       return false;
     }
   }
 
+  static bool WriteFile(const std::string & file_name, const toml::value & v)
+  {
+    try {
+      std::ofstream ofs(file_name, std::ofstream::out);
+      ofs << v;
+      ofs.close();
+      return true;
+    } catch (const std::exception & e) {
+      std::cerr << e.what() << '\n';
+      return false;
+    }
+
+  }
+
   template<typename T>
   static bool Get(const toml::value & v, const std::string & k, T & m)
   {
-    if(v.count(k) == 0) {
+    if ((v.is_uninitialized()) || (!v.is_table()) || (v.count(k) == 0)) {
       return false;
     } else {
       m = toml::get<T>(v.at(k));
+      return true;
+    }
+  }
+
+  template<typename T>
+  static bool Get(const toml::value & v, size_t k, T & m)
+  {
+    if ((v.is_uninitialized()) || (!v.is_array()) || (!(v.size() > k))) {
+      return false;
+    } else {
+      m = toml::get<T>(v.at(k));
+      return true;
+    }
+  }
+
+  template<typename T>
+  static bool Set(toml::value & v, const std::string & k, const T & m)
+  {
+    if ((!v.is_uninitialized()) && (!v.is_table())) {
+      return false;
+    } else {
+      v[k] = m;
+      return true;
+    }
+  }
+
+  template<typename T>
+  static bool Set(toml::value & v, const T & m)
+  {
+    if (v.is_uninitialized()) {
+      std::vector<int> t;
+      v = t;
+      v.as_array().push_back(m);
+    } else if (!v.is_array()) {
+      return false;
+    }
+    return true;
+  }
+
+  template<typename T>
+  static bool Set(toml::value & v, size_t k, const T & m)
+  {
+    if (v.is_uninitialized() || (!v.is_array()) || (!(v.size() > k))) {
+      return false;
+    } else {
+      v[k] = m;
       return true;
     }
   }
