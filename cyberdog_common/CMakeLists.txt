@@ -23,13 +23,14 @@ if(BUILD_TESTING)
   ament_add_gtest(jsontest test/json_test.cpp)
   ament_add_gtest(tomltest test/toml_test.cpp)
   target_compile_definitions(tomltest PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
+  target_compile_definitions(jsontest PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
   ament_target_dependencies(tomltest rclcpp toml)
   ament_target_dependencies(jsontest rclcpp rapidjson)
   install(TARGETS
     jsontest tomltest
     DESTINATION lib/${PROJECT_NAME})
   install(FILES
-    test/benchmark.toml
+    test/benchmark.toml test/benchmark.json
     DESTINATION lib/${PROJECT_NAME})
   ament_lint_auto_find_test_dependencies()
 endif()
