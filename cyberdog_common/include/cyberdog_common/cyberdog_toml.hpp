@@ -33,10 +33,11 @@ public:
   CyberdogToml() {}
   ~CyberdogToml() {}
 
-public: /* Trans data between toml and file. */
+public:
+  /* Trans data between toml and file. */
   /**
    * @brief 从文件中读取数据，并翻译成toml数据结构
-   * 
+   *
    * @return  是否执行成功.
    *          注意： 如果返回失败，需要调用代码自行处理后续业务逻辑.
    *                若无视错误返回，则可能引发未定义行为或程序崩溃，如获取数据Get等.
@@ -70,12 +71,11 @@ public: /* Trans data between toml and file. */
       std::cerr << e.what() << '\n';
       return false;
     }
-
   }
 
   /**
    * @brief 从toml表格数据中，依据键k读取一个值
-   * 
+   *
    * @tparam T 值类型，为toml支持的全部类型
    * @param v 要求已经初始化且为toml value_t::table类型
    * @return 执行是否成功
@@ -93,15 +93,15 @@ public: /* Trans data between toml and file. */
     }
   }
 
-    /**
-   * @brief 从toml数组数据中，依据角标序号读取一个值
-   * 
-   * @tparam T 值类型，为toml支持的全部类型
-   * @param v 要求已经初始化且为toml value_t::array类型
-   * @return 执行是否成功
-   *         注意： 如果返回失败，需要调用代码自行处理后续业务逻辑.
-   *               此时的返回形参是不可使用状态，对其操作的行为未定义.
-   */
+  /**
+ * @brief 从toml数组数据中，依据角标序号读取一个值
+ *
+ * @tparam T 值类型，为toml支持的全部类型
+ * @param v 要求已经初始化且为toml value_t::array类型
+ * @return 执行是否成功
+ *         注意： 如果返回失败，需要调用代码自行处理后续业务逻辑.
+ *               此时的返回形参是不可使用状态，对其操作的行为未定义.
+ */
   template<typename T>
   static bool Get(const toml::value & v, size_t k, T & m)
   {
@@ -117,7 +117,7 @@ public: /* Trans data between toml and file. */
    * @brief 为toml表格数据设置一个值
    *          1. 若该键已经存在，则会覆盖，包括不同类型
    *          2. 若该键不存在，则会添加一个新的键值对
-   * 
+   *
    * @tparam T 值类型，为toml支持的全部类型
    * @param v 要求未初始化， 或者已经初始化为toml value_t::table类型
    * @return 执行是否成功
@@ -138,7 +138,7 @@ public: /* Trans data between toml and file. */
   /**
    * @brief 为toml数组数据设置一个值
    *          1. 该值会被追加在数组末尾
-   * 
+   *
    * @tparam T 值类型，为toml支持的全部类型
    * @param v 要求未初始化， 或者已经初始化为toml value_t::array类型
    * @return 执行是否成功
@@ -162,7 +162,7 @@ public: /* Trans data between toml and file. */
    * @brief 为toml数组数据设置一个值，依据角标序号
    *          1. 若序号已经存在，则会覆盖，包括不同类型
    *          2. 若值序号不存在，则不会添加，且返回错误
-   * 
+   *
    * @tparam T 值类型，为toml支持的全部类型
    * @param v 要求未初始化， 或者已经初始化为toml value_t::array类型
    * @return 执行是否成功

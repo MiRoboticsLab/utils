@@ -93,7 +93,7 @@ TEST(cyberdogjson, reader)
   EXPECT_EQ(strcmp(hello.c_str(), "Cyberdog"), 0);
   EXPECT_FALSE(CyberdogJson::Get(d, "world", hello));
   json::Document dd(json::kArrayType);
-  
+
   int no;
   result = CyberdogJson::Get(dd, "no", no);
   EXPECT_FALSE(result);

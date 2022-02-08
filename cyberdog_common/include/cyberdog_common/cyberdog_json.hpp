@@ -61,8 +61,10 @@ public:
    */
   static bool Add(json::Document & doc, const std::string & keyName, const int value)
   {
-    if(!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n", __func__);
+    if (!doc.IsObject()) {
+      fprintf(
+        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+        __func__);
       return false;
     }
     if (doc.HasMember(keyName.c_str())) {
@@ -78,8 +80,10 @@ public:
 
   static bool Add(json::Document & doc, const std::string & keyName, const uint64_t value)
   {
-    if(!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n", __func__);
+    if (!doc.IsObject()) {
+      fprintf(
+        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+        __func__);
       return false;
     }
     if (doc.HasMember(keyName.c_str())) {
@@ -95,8 +99,10 @@ public:
 
   static bool Add(json::Document & doc, const std::string & keyName, const double value)
   {
-    if(!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n", __func__);
+    if (!doc.IsObject()) {
+      fprintf(
+        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+        __func__);
       return false;
     }
     if (doc.HasMember(keyName.c_str())) {
@@ -112,8 +118,10 @@ public:
 
   static bool Add(json::Document & doc, const std::string & keyName, const float value)
   {
-    if(!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n", __func__);
+    if (!doc.IsObject()) {
+      fprintf(
+        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+        __func__);
       return false;
     }
     if (doc.HasMember(keyName.c_str())) {
@@ -131,8 +139,10 @@ public:
     json::Document & doc, const std::string & keyName,
     const std::string value)
   {
-    if(!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n", __func__);
+    if (!doc.IsObject()) {
+      fprintf(
+        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+        __func__);
       return false;
     }
     json::Document::AllocatorType & allocator = doc.GetAllocator();
@@ -149,8 +159,10 @@ public:
 
   static bool Add(json::Document & doc, const std::string & keyName, const char * value)
   {
-    if(!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n", __func__);
+    if (!doc.IsObject()) {
+      fprintf(
+        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+        __func__);
       return false;
     }
     json::Document::AllocatorType & allocator = doc.GetAllocator();
@@ -167,8 +179,10 @@ public:
 
   static bool Add(json::Document & doc, const std::string & keyName, const bool value)
   {
-    if(!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n", __func__);
+    if (!doc.IsObject()) {
+      fprintf(
+        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+        __func__);
       return false;
     }
     if (doc.HasMember(keyName.c_str())) {
@@ -186,8 +200,10 @@ public:
     json::Document & doc, const std::string & keyName,
     json::Value & value)
   {
-    if(!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n", __func__);
+    if (!doc.IsObject()) {
+      fprintf(
+        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+        __func__);
       return false;
     }
     json::Document::AllocatorType & allocator = doc.GetAllocator();
@@ -204,13 +220,13 @@ public:
 
   /**
    * @brief 与上述Add API功能一致
-   * 
+   *
    * @param doc 要求具有rapidjson::kArrayType类型
    */
   static bool Add(json::Document & doc, json::Document & value)
   {
     bool ret = true;
-    if (! doc.IsArray()) {
+    if (!doc.IsArray()) {
       fprintf(stderr, "[CyberdogJson][%s] failed! Doc shouled be json::kArrayType.\n", __func__);
       ret = false;
     } else {
@@ -225,7 +241,7 @@ public:
   static bool Add(json::Document & doc, json::Value & value)
   {
     bool ret = true;
-    if (! doc.IsArray()) {
+    if (!doc.IsArray()) {
       fprintf(stderr, "[CyberdogJson][%s] failed! Doc shouled be json::kArrayType.\n", __func__);
       ret = false;
     } else {
@@ -237,11 +253,12 @@ public:
     return ret;
   }
 
-public: /* convert between string and json data */
+public:
+  /* convert between string and json data */
   /**
    * @brief 反序列化
    *        将字符串转化成json数据结构
-   * 
+   *
    * @param str 要求具有json数据组织形式，形如： "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}"
    * @param doc 注意： 原有数据会被覆盖
    * @return 执行是否成功
@@ -257,7 +274,9 @@ public: /* convert between string and json data */
     } else {
       doc.Parse<0>(str.c_str());
       if (doc.HasParseError()) {
-        fprintf(stderr, "[CyberdogJson][%s]: failed! Doc parse error with input:\n\t%s\n ", __func__, str.c_str());
+        fprintf(
+          stderr, "[CyberdogJson][%s]: failed! Doc parse error with input:\n\t%s\n ",
+          __func__, str.c_str());
         ret = false;
       }
     }
@@ -267,7 +286,7 @@ public: /* convert between string and json data */
   /**
    * @brief 序列化
    *        将一个Document转化成string，用于传输.
-   * 
+   *
    * @param doc 要求具有json::kObjectType或json::kArrayType.
    * @param str 可用于传输的字符串.
    *            对于接收方的反序列化工具没有要求，支持RFC7159(https://www.rfc-editor.org/info/rfc7159)及以上即可。
@@ -278,7 +297,10 @@ public: /* convert between string and json data */
   static bool Document2String(const json::Document & doc, std::string & str)
   {
     if (!doc.IsObject() && !doc.IsArray()) {
-      fprintf(stderr, "[CyberdogJson][%s]: failed! Input document shouled kObjectType or kArrayType.\n", __func__);
+      fprintf(
+        stderr,
+        "[CyberdogJson][%s]: failed! Input document shouled kObjectType or kArrayType.\n",
+        __func__);
       return false;
     }
 
@@ -301,7 +323,7 @@ public: /* convert between string and json data */
    * @brief 将一个json::value 转换为 json::Document
    *        Document具有完备的内存资源，如分配器等.
    *        进而可以不依赖其它资源进行数据结构再处理，如Add等操作.
-   * 
+   *
    * @return 执行是否成功
    *         注意： 如果返回失败，需要调用代码自行处理后续业务逻辑.
    *               此时的doc是不可用状态，对其操作的行为未定义.
@@ -322,10 +344,11 @@ public: /* convert between string and json data */
     }
   }
 
-public: /* Trans data between json and file. */
+public:
+  /* Trans data between json and file. */
   /**
    * @brief 从文件读取数据，并存储到json内存结构中
-   * 
+   *
    * @param doc 若不为空，原有数据会被覆盖
    * @return 执行是否成功
    *         注意： 如果返回失败，需要调用代码自行处理后续业务逻辑.
@@ -344,7 +367,9 @@ public: /* Trans data between json and file. */
         return true;
       }
     } else {
-      fprintf(stderr, "[CyberdogJson][%s] Failed! Cannot read file!\n%s\n", __func__, jsonFileName.c_str());
+      fprintf(
+        stderr, "[CyberdogJson][%s] Failed! Cannot read file!\n%s\n", __func__,
+        jsonFileName.c_str());
       return false;
     }
   }
@@ -377,7 +402,9 @@ public: /* Trans data between json and file. */
           break;
         } else if (n == wr_len) {
           ret = true;
-          fprintf(stdout, "[CyberdogJson][%s]Msg_size: %d, write %d bytes!\n", __func__, msg_size, n);
+          fprintf(
+            stdout, "[CyberdogJson][%s]Msg_size: %d, write %d bytes!\n", __func__, msg_size,
+            n);
           break;
         }
         len += n;
@@ -406,10 +433,11 @@ private:
     return ret;
   }
 
-public:  /* parse json data */
+public:
+  /* parse json data */
   /**
    * @brief 从json::Document中读取一个值
-   * 
+   *
    * @param doc 要求具有json::kObjectType类型
    * @param value 1. 与rapidjson所支持类型一致，API已经进行了相应重载，直接调用即可
    *              2. 特别地，如果value为复杂类型，如char* 或rapidjson::value，其生命周期与入参Document相同.
@@ -421,7 +449,7 @@ public:  /* parse json data */
     const json::Document & doc, const char * key,
     std::string & value)
   {
-    if(! doc.IsObject()) {
+    if (!doc.IsObject()) {
       fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
@@ -436,7 +464,7 @@ public:  /* parse json data */
 
   static bool Get(const json::Document & doc, const char * key, int & value)
   {
-    if(! doc.IsObject()) {
+    if (!doc.IsObject()) {
       fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
@@ -452,7 +480,7 @@ public:  /* parse json data */
 
   static bool Get(const json::Document & doc, const char * key, uint64_t & value)
   {
-    if(! doc.IsObject()) {
+    if (!doc.IsObject()) {
       fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
@@ -466,7 +494,7 @@ public:  /* parse json data */
 
   static bool Get(json::Document & doc, const char * key, json::Value & value)
   {
-    if(! doc.IsObject()) {
+    if (!doc.IsObject()) {
       fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
@@ -480,7 +508,7 @@ public:  /* parse json data */
 
   static bool Get(const json::Document & doc, const char * key, float & value)
   {
-    if(! doc.IsObject()) {
+    if (!doc.IsObject()) {
       fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
@@ -499,7 +527,7 @@ public:  /* parse json data */
 
   static bool Get(const json::Document & doc, const char * key, bool & value)
   {
-    if(! doc.IsObject()) {
+    if (!doc.IsObject()) {
       fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
@@ -513,7 +541,7 @@ public:  /* parse json data */
 
   /**
    * @brief 从json::Value中读取一个值
-   * 
+   *
    * @param doc 要求具有json::kObjectType类型
    * @param value 1. 与rapidjson所支持类型一致，API已经进行了相应重载，直接调用即可
    *              2. 特别地，如果value为复杂类型，如char* 或rapidjson::value，其生命周期与入参Value相同.
@@ -523,7 +551,7 @@ public:  /* parse json data */
    */
   static bool Get(const json::Value & val, const char * key, std::string & value)
   {
-    if(! val.IsObject()) {
+    if (!val.IsObject()) {
       fprintf(stderr, "[CyberdogJson][%s]Failed! Input val should be kObejectType!\n", __func__);
       return false;
     }
@@ -538,7 +566,7 @@ public:  /* parse json data */
 
   static bool Get(const json::Value & val, const char * key, int & value)
   {
-    if(! val.IsObject()) {
+    if (!val.IsObject()) {
       fprintf(stderr, "[CyberdogJson][%s]Failed! Input val should be kObejectType!\n", __func__);
       return false;
     }
@@ -552,7 +580,7 @@ public:  /* parse json data */
 
   static bool Get(const json::Value & val, const char * key, bool & value)
   {
-    if(! val.IsObject()) {
+    if (!val.IsObject()) {
       fprintf(stderr, "[CyberdogJson][%s]Failed! Input val should be kObejectType!\n", __func__);
       return false;
     }
@@ -563,7 +591,6 @@ public:  /* parse json data */
     value = val[key].GetBool();
     return true;
   }
-
 };  // class CyberdogJson
 }  // namespace common
 }  // namespace cyberdog
