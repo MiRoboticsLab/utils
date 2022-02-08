@@ -11,19 +11,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/**
- * @file toml_test.cpp
- * @author dukun (dukun1@xiaomi.com)
- * @brief Test toml package functions and performance,
- *        Under googletest.
- *        Should not be compiled in OTA or DailyBuild version.
- * @version 0.1
- * @date 2022-02-05
- *
- */
+
+// Test toml package functions and performance,
+// Under googletest.
+// Should not be compiled in OTA or DailyBuild version
+
 #include <dirent.h>
 #include <stdio.h>
 #include <iostream>
+#include <string>
 #include <algorithm>
 #include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_toml.hpp"
