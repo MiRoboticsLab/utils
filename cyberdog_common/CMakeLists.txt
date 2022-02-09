@@ -16,6 +16,11 @@ find_package(rclcpp REQUIRED)
 install(DIRECTORY include/
   DESTINATION include/)
 
+set(dependencies
+  toml
+  rapidjson
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
@@ -36,4 +41,5 @@ if(BUILD_TESTING)
 endif()
 
 ament_export_include_directories(include)
+ament_export_dependencies(${dependencies})
 ament_package()
