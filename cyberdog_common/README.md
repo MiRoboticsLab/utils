@@ -100,7 +100,7 @@
 
 4. 若要进一步或直接使用toml11, 其源码位于"cyberdog_ws/third_party/toml"，但不推荐这么做。如果发生第三方库的更换，其回归工作量可能较大。
 
-5. 基本应用请参考json_test.cpp.
+5. 基本应用请参考toml_test.cpp.
 
 6. 更多参考：
 
