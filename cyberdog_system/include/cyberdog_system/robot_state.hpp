@@ -19,7 +19,7 @@ namespace cyberdog
 {
 namespace system
 {
-enum class ManagerState : int8_t  // status ? 
+enum class ManagerState : int8_t  // status ?
 {
   kError = -1,
   kOK = 0,
@@ -45,7 +45,7 @@ enum class SensorState : int8_t
   kNotReady
 };  // enum class SensorState
 
-}  // namespace base
+}  // namespace system
 }  // namespace cyberdog
 
 #endif  // CYBERDOG_SYSTEM__ROBOT_STATE_HPP_

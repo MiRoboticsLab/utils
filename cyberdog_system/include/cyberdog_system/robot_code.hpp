@@ -72,9 +72,7 @@ enum class KeyCode : int32_t
   kSelfCheckFailed = 8,
   kParametersInvalid = 9,
 };  // enum class KeyCode
-
-
-}  // namespace base
+}  // namespace system
 }  // namespace cyberdog
 
-#endif // CYBERDOG_SYSTEM__ROBOT_CODE_HPP_
+#endif  // CYBERDOG_SYSTEM__ROBOT_CODE_HPP_
