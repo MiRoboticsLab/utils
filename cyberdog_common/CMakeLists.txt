@@ -13,12 +13,40 @@ find_package(rapidjson REQUIRED)
 find_package(toml REQUIRED)
 find_package(rclcpp REQUIRED)
 
+add_library(cyberdog_log SHARED
+  include/cyberdog_common/cyberdog_log.hpp
+  src/cyberdog_log.cpp)
+target_include_directories(cyberdog_log PUBLIC
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+$<INSTALL_INTERFACE:include>)  
+target_compile_definitions(cyberdog_log
+  PRIVATE "CYBERDOG_LOG_DLL")  
+ament_target_dependencies(
+  cyberdog_log
+  PUBLIC
+  rclcpp)
+
+if(NOT WIN32)
+  ament_environment_hooks(
+    "${ament_cmake_package_templates_ENVIRONMENT_HOOK_LIBRARY_PATH}")
+endif()  
+
 install(DIRECTORY include/
   DESTINATION include/)
+
+install(
+  TARGETS cyberdog_log
+  EXPORT cyberdog_log
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
 
 set(dependencies
   toml
   rapidjson
+  rclcpp
 )
 
 if(BUILD_TESTING)
@@ -27,12 +55,14 @@ if(BUILD_TESTING)
   include_directories(include)
   ament_add_gtest(jsontest test/json_test.cpp)
   ament_add_gtest(tomltest test/toml_test.cpp)
+  ament_add_gtest(logtest test/log_test.cpp src/cyberdog_log.cpp)
   target_compile_definitions(tomltest PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
   target_compile_definitions(jsontest PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
   ament_target_dependencies(tomltest rclcpp toml)
   ament_target_dependencies(jsontest rclcpp rapidjson)
+  ament_target_dependencies(logtest rclcpp)
   install(TARGETS
-    jsontest tomltest
+    jsontest tomltest logtest
     DESTINATION lib/${PROJECT_NAME})
   install(FILES
     test/benchmark.toml test/benchmark.json
@@ -41,5 +71,7 @@ if(BUILD_TESTING)
 endif()
 
 ament_export_include_directories(include)
+ament_export_targets(cyberdog_log HAS_LIBRARY_TARGET)
+# ament_export_libraries(cyberdog_log)
 ament_export_dependencies(${dependencies})
 ament_package()
