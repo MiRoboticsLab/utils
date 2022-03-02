@@ -4,6 +4,7 @@
 
 - json
 - toml
+- log
 
 
 
@@ -109,4 +110,88 @@
    [toml协议](https://github.com/toml-lang/toml)
 
    [toml配置入门](https://mojotv.cn/2018/12/26/what-is-toml)
+
+
+ 
+## Log
+
+1、package.xml文件中添加：
+``` xml
+<build_depend>cyberdog_common</build_depend>
+<exec_depend>cyberdog_common</exec_depend>
+```
+2、CMakeLists.txt文件添加： 
+``` cmake
+# log_test为要生成的节点，需要链接${cyberdog_log_LIBRARIES}
+add_executable(log_test src/log_test.cpp)
+target_link_libraries(log_test
+    ${cyberdog_log_LIBRARIES}
+)
+target_include_directories(log_test PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+```
+3、节点引用日志宏
+``` cpp
+#include "rclcpp/rclcpp.hpp"
+// 包含日志封装头文件
+#include "cyberdog_common/cyberdog_log.hpp"
+#include "std_msgs/msg/string.hpp"
+
+class LoggerUsage : public rclcpp::Node
+{
+public:
+  LoggerUsage(): Node("logger_usage_demo"), count_(0)
+  { //生成节点相关名称空间“logger_usage_demo”
+    pub_ = create_publisher<std_msgs::msg::String>("logging_demo_count", 10);
+    timer_ = create_wall_timer(500ms, std::bind(&LoggerUsage::on_timer, this));
+    debug_function_to_evaluate_ = std::bind(&LoggerUsage::is_divisor_of_twelve, this, std::cref(count_));
+  }
+protected:
+  void on_timer()
+  {
+    // 打印一次
+    INFO_ONCE("Timer callback called (this will only log once)");
+    auto msg = std::make_unique<std_msgs::msg::String>();
+    msg->data = "Current count: " + std::to_string(count_);
+    // 输出日志，INFO级别
+    INFO("Publishing: '%s'", msg->data.c_str());
+    pub_->publish(std::move(msg));
+    // 函数返回true打印
+    DEBUG_FUNCTION(
+      &debug_function_to_evaluate_,
+      "Count divides into 12 (function evaluated to true)");
+    // 表达式返回true打印
+    DEBUG_EXPRESSION(
+      (count_ % 2) == 0, "Count is even (expression evaluated to true)");
+    if (count_++ >= 15) {
+      WARN("Reseting count to 0");
+      count_ = 0;
+    }    
+  }
+  bool is_divisor_of_twelve(size_t val)
+  {
+    if (val == 0) {
+      ERROR("Modulo divisor cannot be 0");
+      return false;
+    }
+    return (12 % val) == 0;
+  }  
+private:
+  size_t count_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_;
+  rclcpp::TimerBase::SharedPtr one_shot_timer_, timer_;
+  std::function<bool()> debug_function_to_evaluate_;
+};
+
+int main(int argc, char ** argv)
+{
+  //生成全局名称空间“Global_Name”
+  LOGGER_MAIN_INSTANCE("Global_Name");
+  // 输出日志，INFO级别
+  INFO("hello world");
+  auto node1 = std::make_shared<LoggerConfig>();
+}
+```   
 

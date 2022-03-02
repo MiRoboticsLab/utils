@@ -57,56 +57,37 @@ private:
 } // namespace common
 } // namespace cyberdog
 
+inline rclcpp::Logger get_logger()
+{
+  return *(cyberdog::common::CyberdogLoggerFactory::Get_Logger());
+}
+
 #define LOGGER_MAIN_INSTANCE(instance_name) \
         std::shared_ptr<rclcpp::Logger> out_logger = cyberdog::common::CyberdogLoggerFactory::Get_Logger(instance_name);
 
-#define DEBUG(...) RCLCPP_DEBUG((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), __VA_ARGS__)
-#define INFO(...) RCLCPP_INFO((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), __VA_ARGS__)
-#define WARN(...) RCLCPP_WARN((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), __VA_ARGS__)
-#define ERROR(...) RCLCPP_ERROR((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), __VA_ARGS__)
-#define FATAL(...) RCLCPP_FATAL((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), __VA_ARGS__)
+#define DEBUG(...) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
+#define INFO(...) RCLCPP_INFO(get_logger(), __VA_ARGS__)
+#define WARN(...) RCLCPP_WARN(get_logger(), __VA_ARGS__)
+#define ERROR(...) RCLCPP_ERROR(get_logger(), __VA_ARGS__)
+#define FATAL(...) RCLCPP_FATAL(get_logger(), __VA_ARGS__)
 
-#define N_DEBUG(...) RCLCPP_DEBUG(this->get_logger(), __VA_ARGS__)
-#define N_INFO(...) RCLCPP_INFO(this->get_logger(), __VA_ARGS__)
-#define N_WARN(...) RCLCPP_WARN(this->get_logger(), __VA_ARGS__)
-#define N_ERROR(...) RCLCPP_ERROR(this->get_logger(), __VA_ARGS__)
-#define N_FATAL(...) RCLCPP_FATAL(this->get_logger(), __VA_ARGS__)
+#define DEBUG_ONCE(...) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
+#define INFO_ONCE(...) RCLCPP_INFO_ONCE(get_logger(), __VA_ARGS__)
+#define WARN_ONCE(...) RCLCPP_WARN_ONCE(get_logger(), __VA_ARGS__)
+#define ERROR_ONCE(...) RCLCPP_ERROR_ONCE(get_logger(), __VA_ARGS__)
+#define FATAL_ONCE(...) RCLCPP_FATAL_ONCE(get_logger(), __VA_ARGS__)
 
-#define DEBUG_ONCE(...) RCLCPP_DEBUG_ONCE((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), __VA_ARGS__)
-#define INFO_ONCE(...) RCLCPP_INFO_ONCE((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), __VA_ARGS__)
-#define WARN_ONCE(...) RCLCPP_WARN_ONCE((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), __VA_ARGS__)
-#define ERROR_ONCE(...) RCLCPP_ERROR_ONCE((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), __VA_ARGS__)
-#define FATAL_ONCE(...) RCLCPP_FATAL_ONCE((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), __VA_ARGS__)
+#define DEBUG_FUNCTION(function, ...) RCLCPP_DEBUG_FUNCTION(get_logger(), function, __VA_ARGS__)
+#define INFO_FUNCTION(function, ...) RCLCPP_INFO_FUNCTION(get_logger(), function, __VA_ARGS__)
+#define WARN_FUNCTION(function, ...) RCLCPP_WARN_FUNCTION(get_logger(), function, __VA_ARGS__)
+#define ERROR_FUNCTION(function, ...) RCLCPP_ERROR_FUNCTION(get_logger(), function, __VA_ARGS__)
+#define FATAL_FUNCTION(function, ...) RCLCPP_FATAL_FUNCTION(get_logger(), function, __VA_ARGS__)
 
-#define N_DEBUG_ONCE(...) RCLCPP_DEBUG_ONCE(this->get_logger(), __VA_ARGS__)
-#define N_INFO_ONCE(...) RCLCPP_INFO_ONCE(this->get_logger(), __VA_ARGS__)
-#define N_WARN_ONCE(...) RCLCPP_WARN_ONCE(this->get_logger(), __VA_ARGS__)
-#define N_ERROR_ONCE(...) RCLCPP_ERROR_ONCE(this->get_logger(), __VA_ARGS__)
-#define N_FATAL_ONCE(...) RCLCPP_FATAL_ONCE(this->get_logger(), __VA_ARGS__)
-
-#define DEBUG_FUNCTION(function, ...) RCLCPP_DEBUG_FUNCTION((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), function, __VA_ARGS__)
-#define INFO_FUNCTION(function, ...) RCLCPP_INFO_FUNCTION((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), function, __VA_ARGS__)
-#define WARN_FUNCTION(function, ...) RCLCPP_WARN_FUNCTION((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), function, __VA_ARGS__)
-#define ERROR_FUNCTION(function, ...) RCLCPP_ERROR_FUNCTION((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), function, __VA_ARGS__)
-#define FATAL_FUNCTION(function, ...) RCLCPP_FATAL_FUNCTION((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), function, __VA_ARGS__)
-
-#define N_DEBUG_FUNCTION(function, ...) RCLCPP_DEBUG_FUNCTION(this->get_logger(), function, __VA_ARGS__)
-#define N_INFO_FUNCTION(function, ...) RCLCPP_INFO_FUNCTION(this->get_logger(), function, __VA_ARGS__)
-#define N_WARN_FUNCTION(function, ...) RCLCPP_WARN_FUNCTION(this->get_logger(), function, __VA_ARGS__)
-#define N_ERROR_FUNCTION(function, ...) RCLCPP_ERROR_FUNCTION(this->get_logger(), function, __VA_ARGS__)
-#define N_FATAL_FUNCTION(function, ...) RCLCPP_FATAL_FUNCTION(this->get_logger(), function, __VA_ARGS__)
-
-#define DEBUG_EXPRESSION(expression, ...) RCLCPP_DEBUG_EXPRESSION((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), expression, __VA_ARGS__)
-#define INFO_EXPRESSION(expression, ...) RCLCPP_INFO_EXPRESSION((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), expression, __VA_ARGS__)
-#define WARN_EXPRESSION(expression, ...) RCLCPP_WARN_EXPRESSION((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), expression, __VA_ARGS__)
-#define ERROR_EXPRESSION(expression, ...) RCLCPP_ERROR_EXPRESSION((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), expression, __VA_ARGS__)
-#define FATAL_EXPRESSION(expression, ...) RCLCPP_FATAL_EXPRESSION((*(cyberdog::common::CyberdogLoggerFactory::Get_Logger())), expression, __VA_ARGS__)
-
-#define N_DEBUG_EXPRESSION(expression, ...) RCLCPP_DEBUG_EXPRESSION(this->get_logger(), expression, __VA_ARGS__)
-#define N_INFO_EXPRESSION(expression, ...) RCLCPP_INFO_EXPRESSION(this->get_logger(), expression, __VA_ARGS__)
-#define N_WARN_EXPRESSION(expression, ...) RCLCPP_WARN_EXPRESSION(this->get_logger(), expression, __VA_ARGS__)
-#define N_ERROR_EXPRESSION(expression, ...) RCLCPP_ERROR_EXPRESSION(this->get_logger(), expression, __VA_ARGS__)
-#define N_FATAL_EXPRESSION(expression, ...) RCLCPP_FATAL_EXPRESSION(this->get_logger(), expression, __VA_ARGS__)
+#define DEBUG_EXPRESSION(expression, ...) RCLCPP_DEBUG_EXPRESSION(get_logger(), expression, __VA_ARGS__)
+#define INFO_EXPRESSION(expression, ...) RCLCPP_INFO_EXPRESSION(get_logger(), expression, __VA_ARGS__)
+#define WARN_EXPRESSION(expression, ...) RCLCPP_WARN_EXPRESSION(get_logger(), expression, __VA_ARGS__)
+#define ERROR_EXPRESSION(expression, ...) RCLCPP_ERROR_EXPRESSION(get_logger(), expression, __VA_ARGS__)
+#define FATAL_EXPRESSION(expression, ...) RCLCPP_FATAL_EXPRESSION(get_logger(), expression, __VA_ARGS__)
 
 /*
 #define LOGGER_INSTANCE(instance_name) \
