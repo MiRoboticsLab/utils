@@ -24,6 +24,7 @@ target_compile_definitions(cyberdog_log
 ament_target_dependencies(
   cyberdog_log
   PUBLIC
+  toml
   rclcpp)
 
 if(NOT WIN32)
