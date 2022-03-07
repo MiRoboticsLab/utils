@@ -24,7 +24,7 @@ namespace common
 {
 #define UNINITIALIZED_NAME "uninitialized"
 
-class CyberdogLogger final
+class CyberdogLogger
 {
 public:
   CyberdogLogger(const char* name):logger_name(name) {
@@ -33,12 +33,20 @@ public:
       : 
       std::make_shared<rclcpp::Logger>(rclcpp::get_logger(logger_name));
   }
+  CyberdogLogger(const CyberdogLogger &) =delete;
+  CyberdogLogger &operator=(const CyberdogLogger &)=delete; 
+
   ~CyberdogLogger() {}
 
-std::shared_ptr<rclcpp::Logger> Get_Logger()
-{
-    return logger;
-}
+  inline rclcpp::Logger get_logger()
+  {
+    return *Get_Logger();
+  }
+
+  std::shared_ptr<rclcpp::Logger> Get_Logger()
+  {
+      return logger;
+  }
 
 private:
   std::string logger_name;
