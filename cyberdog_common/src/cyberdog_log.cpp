@@ -76,8 +76,10 @@
 // } // namespace common
 // } // namespace cyberdog
 
-// using namespace cyberdog::common;
-
+namespace cyberdog
+{
+namespace common
+{
 std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::main_logger = nullptr;
 
 std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger()
@@ -98,3 +100,6 @@ std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger(const char * s
   }
   return main_logger;
 }
+
+}  // namespace common
+}  // namespace cyberdog

@@ -23,7 +23,6 @@
 #include <algorithm>
 #include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_toml.hpp"
-// using namespace cyberdog::common;
 
 TEST(hello, hello__Test)
 {
@@ -34,42 +33,45 @@ TEST(hello, hello__Test)
 TEST(file, parser)
 {
   toml::value value;
-  auto result = CyberdogToml::ParseFile("nofile", value);
+  auto result = cyberdog::common::CyberdogToml::ParseFile("nofile", value);
   EXPECT_FALSE(result);
 
-  result = CyberdogToml::ParseFile(std::string(BenchmarkPath) + "/benchmark.toml", value);
+  result = cyberdog::common::CyberdogToml::ParseFile(
+    std::string(BenchmarkPath) + "/benchmark.toml", value);
   EXPECT_TRUE(result);
 }
 
 TEST(reader, table)
 {
   toml::value value;
-  if (!CyberdogToml::ParseFile(std::string(BenchmarkPath) + "/benchmark.toml", value)) {
+  if (!cyberdog::common::CyberdogToml::ParseFile(
+      std::string(BenchmarkPath) + "/benchmark.toml", value))
+  {
     return;
   }
 
   toml::value a;
-  auto result = CyberdogToml::Get(value, "a", a);
+  auto result = cyberdog::common::CyberdogToml::Get(value, "a", a);
   EXPECT_TRUE(result);
   EXPECT_TRUE(a.is_table());
 
   int aa;
-  result = CyberdogToml::Get(a, "a", aa);
+  result = cyberdog::common::CyberdogToml::Get(a, "a", aa);
   EXPECT_TRUE(result);
   EXPECT_EQ(aa, 1);
 
   std::string ab;
-  result = CyberdogToml::Get(a, "b", ab);
+  result = cyberdog::common::CyberdogToml::Get(a, "b", ab);
   EXPECT_TRUE(result);
   EXPECT_EQ(ab, std::string("cyberdog"));
 
   bool ac;
-  result = CyberdogToml::Get(a, "c", ac);
+  result = cyberdog::common::CyberdogToml::Get(a, "c", ac);
   EXPECT_TRUE(result);
   EXPECT_EQ(ac, true);
 
   float ad;
-  result = CyberdogToml::Get(a, "d", ad);
+  result = cyberdog::common::CyberdogToml::Get(a, "d", ad);
   EXPECT_TRUE(result);
   EXPECT_EQ(ad, static_cast<float>(0.1));
 }
@@ -77,44 +79,48 @@ TEST(reader, table)
 TEST(reader, array)
 {
   toml::value value;
-  if (!CyberdogToml::ParseFile(std::string(BenchmarkPath) + "/benchmark.toml", value)) {
+  if (!cyberdog::common::CyberdogToml::ParseFile(
+      std::string(BenchmarkPath) + "/benchmark.toml", value))
+  {
     return;
   }
 
   toml::value b;
-  auto result = CyberdogToml::Get(value, "b", b);
+  auto result = cyberdog::common::CyberdogToml::Get(value, "b", b);
   EXPECT_TRUE(result);
   EXPECT_TRUE(b.is_array());
   EXPECT_TRUE(b.as_array().at(0).is_table());
 
   toml::value b0;
-  result = CyberdogToml::Get(b, 0, b0);
+  result = cyberdog::common::CyberdogToml::Get(b, 0, b0);
   EXPECT_TRUE(result);
   EXPECT_TRUE(b0.is_table());
-  result = CyberdogToml::Get(b, 10, b0);
+  result = cyberdog::common::CyberdogToml::Get(b, 10, b0);
   EXPECT_FALSE(result);
 }
 
 TEST(writer, modify)
 {
   toml::value value;
-  if (!CyberdogToml::ParseFile(std::string(BenchmarkPath) + "/benchmark.toml", value)) {
+  if (!cyberdog::common::CyberdogToml::ParseFile(
+      std::string(BenchmarkPath) + "/benchmark.toml", value))
+  {
     return;
   }
 
   toml::value b;
-  auto result = CyberdogToml::Get(value, "b", b);
+  auto result = cyberdog::common::CyberdogToml::Get(value, "b", b);
   EXPECT_TRUE(result);
-  result = CyberdogToml::Set(b, "a", 0);
+  result = cyberdog::common::CyberdogToml::Set(b, "a", 0);
   EXPECT_FALSE(result);
 
   toml::value b1;
-  result = CyberdogToml::Get(b, 1, b1);
+  result = cyberdog::common::CyberdogToml::Get(b, 1, b1);
   EXPECT_TRUE(result);
-  result = CyberdogToml::Set(b1, "c", true);
+  result = cyberdog::common::CyberdogToml::Set(b1, "c", true);
   EXPECT_TRUE(result);
   bool b1c;
-  result = CyberdogToml::Get(b1, "c", b1c);
+  result = cyberdog::common::CyberdogToml::Get(b1, "c", b1c);
   EXPECT_TRUE(b1c);
 }
 
@@ -123,24 +129,24 @@ TEST(writer, add)
   toml::value a;
   std::cout << a.is_uninitialized() << std::endl;
   std::cout << a.is_table() << std::endl;
-  auto result = CyberdogToml::Set(a, "b", std::string("xiaomi"));
+  auto result = cyberdog::common::CyberdogToml::Set(a, "b", std::string("xiaomi"));
   EXPECT_TRUE(result);
 
   std::string ab;
-  result = CyberdogToml::Get(a, "b", ab);
+  result = cyberdog::common::CyberdogToml::Get(a, "b", ab);
   EXPECT_TRUE(result);
   EXPECT_EQ(ab, std::string("xiaomi"));
 
   toml::value b;
-  result = CyberdogToml::Set(b, 0, std::string("xiaomi"));
+  result = cyberdog::common::CyberdogToml::Set(b, 0, std::string("xiaomi"));
   EXPECT_FALSE(result);
 
-  result = CyberdogToml::Set(b, std::string("xiaomi"));
+  result = cyberdog::common::CyberdogToml::Set(b, std::string("xiaomi"));
   EXPECT_TRUE(result);
   EXPECT_TRUE(b.is_array());
 
   std::string b0;
-  result = CyberdogToml::Get(b, 0, b0);
+  result = cyberdog::common::CyberdogToml::Get(b, 0, b0);
   EXPECT_TRUE(result);
   EXPECT_EQ(b0, std::string("xiaomi"));
 }
