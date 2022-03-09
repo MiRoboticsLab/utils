@@ -12,6 +12,14 @@ find_package(ament_cmake REQUIRED)
 find_package(rapidjson REQUIRED)
 find_package(toml REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(std_srvs REQUIRED)
+
+set(dependencies
+  toml
+  rapidjson
+  rclcpp
+  std_srvs
+)
 
 add_library(cyberdog_log SHARED
   include/cyberdog_common/cyberdog_log.hpp
@@ -23,9 +31,7 @@ target_compile_definitions(cyberdog_log
   PRIVATE "CYBERDOG_LOG_DLL")  
 ament_target_dependencies(
   cyberdog_log
-  PUBLIC
-  toml
-  rclcpp)
+  ${dependencies})
 
 if(NOT WIN32)
   ament_environment_hooks(
@@ -42,12 +48,6 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
-)
-
-set(dependencies
-  toml
-  rapidjson
-  rclcpp
 )
 
 if(BUILD_TESTING)
