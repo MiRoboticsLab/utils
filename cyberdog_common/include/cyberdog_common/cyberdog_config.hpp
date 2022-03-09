@@ -23,41 +23,47 @@ namespace common
 class CyberdogConfig final
 {
 public:
-  CyberdogConfig(const std::string & name) : name_(name) {}
+  CyberdogConfig(const std::string & name)
+  : name_(name) {}
   ~CyberdogConfig() {}
+
 public:
   /**
    * @brief 根据K获取V
    *          1. 若动态配置中存在，则赋值为动态V值
    *          2. 若动态配置不存在，则赋值为静态V值
    *          3. 都不存在，返回false
-   * 
-   * @tparam V 
-   * @param key 
-   * @param value 
-   * @return true 
-   * @return false 
+   *
+   * @tparam V
+   * @param key
+   * @param value
+   * @return true
+   * @return false
    */
   template<typename V>
-  bool Get(const std::string & key, V & value) {
+  bool Get(const std::string & key, V & value)
+  {
     // TODO get value with v
     return true;
   }
 
   template<typename T>
-  bool Get(const std::string & key, std::vector<T> & value) {
+  bool Get(const std::string & key, std::vector<T> & value)
+  {
     // TODO get value with v
     return true;
   }
 
   template<typename V>
-  bool Get(const std::string & key_first, const std::string & key_second, V & value) {
+  bool Get(const std::string & key_first, const std::string & key_second, V & value)
+  {
     // TODO get value with v
     return true;
   }
 
   template<typename V>
-  bool Get(const std::string & key_first, const int & key_second, V & value) {
+  bool Get(const std::string & key_first, const int & key_second, V & value)
+  {
     // TODO get value with v
     return true;
   }
@@ -66,16 +72,17 @@ public:
    * @brief 根据K获取V
    *          1. 若存在动态配置，则存入K-V键值对
    *          2. 若动态配置不存在，则返回false
-   * 
-   * @tparam K 
-   * @tparam V 
-   * @param k 
-   * @param v 
-   * @return true 
-   * @return false 
+   *
+   * @tparam K
+   * @tparam V
+   * @param k
+   * @param v
+   * @return true
+   * @return false
    */
   template<typename K, typename V>
-  bool Set(const K & k, const V & v) {
+  bool Set(const K & k, const V & v)
+  {
     //TODO set value with k
     return true;
   }

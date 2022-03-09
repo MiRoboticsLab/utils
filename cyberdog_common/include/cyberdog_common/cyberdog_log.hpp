@@ -27,20 +27,22 @@ namespace common
 class CyberdogLogger final
 {
 public:
-  CyberdogLogger(const char* name):logger_name(name) {
-      logger = logger_name.empty() ?  
-      std::make_shared<rclcpp::Logger>(rclcpp::get_logger(UNINITIALIZED_NAME)) 
-      : 
+  CyberdogLogger(const char * name)
+  : logger_name(name)
+  {
+    logger = logger_name.empty() ?
+      std::make_shared<rclcpp::Logger>(rclcpp::get_logger(UNINITIALIZED_NAME))
+      :
       std::make_shared<rclcpp::Logger>(rclcpp::get_logger(logger_name));
   }
-  CyberdogLogger(const CyberdogLogger &) =delete;
-  CyberdogLogger &operator=(const CyberdogLogger &)=delete; 
+  CyberdogLogger(const CyberdogLogger &) = delete;
+  CyberdogLogger & operator=(const CyberdogLogger &) = delete;
 
   ~CyberdogLogger() {}
 
   std::shared_ptr<rclcpp::Logger> Get_Logger()
   {
-      return logger;
+    return logger;
   }
 
 private:
@@ -51,10 +53,11 @@ private:
 class CyberdogLoggerFactory final
 {
 public:
-    static std::shared_ptr<rclcpp::Logger> Get_Logger();
-    static std::shared_ptr<rclcpp::Logger> Get_Logger(const char* sz_name);
+  static std::shared_ptr<rclcpp::Logger> Get_Logger();
+  static std::shared_ptr<rclcpp::Logger> Get_Logger(const char * sz_name);
+
 private:
-    static std::shared_ptr<rclcpp::Logger> main_logger;
+  static std::shared_ptr<rclcpp::Logger> main_logger;
 }; // class CyberdogLoggerFactory
 
 } // namespace common
@@ -66,20 +69,22 @@ inline rclcpp::Logger get_logger()
 }
 
 #define LOGGER_MINOR_INSTANCE(instance_name) \
-        std::shared_ptr<rclcpp::Logger> logger; \
-        inline rclcpp::Logger get_logger() { \
-          if(!logger) { \
-            std::shared_ptr<rclcpp::Logger> out_logger = cyberdog::common::CyberdogLoggerFactory::Get_Logger(); \
-            std::string str_name = std::string(out_logger->get_name()) + " " + instance_name; \
-            cyberdog::common::CyberdogLogger cyberdog_logger(str_name.c_str()); \
-            logger = cyberdog_logger.Get_Logger(); \
-          } \
-          return *logger; \
-        }
-        
+  std::shared_ptr<rclcpp::Logger> logger; \
+  inline rclcpp::Logger get_logger() { \
+    if (!logger) { \
+      std::shared_ptr<rclcpp::Logger> out_logger = \
+        cyberdog::common::CyberdogLoggerFactory::Get_Logger(); \
+      std::string str_name = std::string(out_logger->get_name()) + " " + instance_name; \
+      cyberdog::common::CyberdogLogger cyberdog_logger(str_name.c_str()); \
+      logger = cyberdog_logger.Get_Logger(); \
+    } \
+    return *logger; \
+  }
+
 
 #define LOGGER_MAIN_INSTANCE(instance_name) \
-        std::shared_ptr<rclcpp::Logger> out_logger = cyberdog::common::CyberdogLoggerFactory::Get_Logger(instance_name);
+  std::shared_ptr<rclcpp::Logger> out_logger = cyberdog::common::CyberdogLoggerFactory::Get_Logger( \
+    instance_name);
 
 #define DEBUG(...) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define INFO(...) RCLCPP_INFO(get_logger(), __VA_ARGS__)
@@ -108,22 +113,37 @@ inline rclcpp::Logger get_logger()
 #define WARN_FUNCTION(function, ...) RCLCPP_WARN_FUNCTION(get_logger(), function, __VA_ARGS__)
 #define ERROR_FUNCTION(function, ...) RCLCPP_ERROR_FUNCTION(get_logger(), function, __VA_ARGS__)
 #define FATAL_FUNCTION(function, ...) RCLCPP_FATAL_FUNCTION(get_logger(), function, __VA_ARGS__)
-#define DEBUG_STREAM_FUNCTION(function, args) std::stringstream ss; ss << args; DEBUG_FUNCTION(function, "%s", ss.str().c_str())
-#define INFO_STREAM_FUNCTION(function, args) std::stringstream ss; ss << args; INFO_FUNCTION(function, "%s", ss.str().c_str())
-#define WARN_STREAM_FUNCTION(function, args) std::stringstream ss; ss << args; WARN_FUNCTION(function, "%s", ss.str().c_str())
-#define ERROR_STREAM_FUNCTION(function, args) std::stringstream ss; ss << args; ERROR_FUNCTION(function, "%s", ss.str().c_str())
-#define FATAL_STREAM_FUNCTION(function, args) std::stringstream ss; ss << args; FATAL_FUNCTION(function, "%s", ss.str().c_str())
+#define DEBUG_STREAM_FUNCTION(function, args) std::stringstream ss; ss << args; DEBUG_FUNCTION( \
+    function, "%s", ss.str().c_str())
+#define INFO_STREAM_FUNCTION(function, args) std::stringstream ss; ss << args; INFO_FUNCTION( \
+    function, "%s", ss.str().c_str())
+#define WARN_STREAM_FUNCTION(function, args) std::stringstream ss; ss << args; WARN_FUNCTION( \
+    function, "%s", ss.str().c_str())
+#define ERROR_STREAM_FUNCTION(function, args) std::stringstream ss; ss << args; ERROR_FUNCTION( \
+    function, "%s", ss.str().c_str())
+#define FATAL_STREAM_FUNCTION(function, args) std::stringstream ss; ss << args; FATAL_FUNCTION( \
+    function, "%s", ss.str().c_str())
 
-#define DEBUG_EXPRESSION(expression, ...) RCLCPP_DEBUG_EXPRESSION(get_logger(), expression, __VA_ARGS__)
-#define INFO_EXPRESSION(expression, ...) RCLCPP_INFO_EXPRESSION(get_logger(), expression, __VA_ARGS__)
-#define WARN_EXPRESSION(expression, ...) RCLCPP_WARN_EXPRESSION(get_logger(), expression, __VA_ARGS__)
-#define ERROR_EXPRESSION(expression, ...) RCLCPP_ERROR_EXPRESSION(get_logger(), expression, __VA_ARGS__)
-#define FATAL_EXPRESSION(expression, ...) RCLCPP_FATAL_EXPRESSION(get_logger(), expression, __VA_ARGS__)
-#define DEBUG_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; DEBUG_EXPRESSION(expression, "%s", ss.str().c_str())
-#define INFO_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; INFO_EXPRESSION(expression, "%s", ss.str().c_str())
-#define WARN_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; WARN_EXPRESSION(expression, "%s", ss.str().c_str())
-#define ERROR_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; ERROR_EXPRESSION(expression, "%s", ss.str().c_str())
-#define FATAL_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; FATAL_EXPRESSION(expression, "%s", ss.str().c_str())
+#define DEBUG_EXPRESSION(expression, ...) RCLCPP_DEBUG_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define INFO_EXPRESSION(expression, ...) RCLCPP_INFO_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define WARN_EXPRESSION(expression, ...) RCLCPP_WARN_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define ERROR_EXPRESSION(expression, ...) RCLCPP_ERROR_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define FATAL_EXPRESSION(expression, ...) RCLCPP_FATAL_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define DEBUG_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; \
+  DEBUG_EXPRESSION(expression, "%s", ss.str().c_str())
+#define INFO_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; INFO_EXPRESSION( \
+    expression, "%s", ss.str().c_str())
+#define WARN_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; WARN_EXPRESSION( \
+    expression, "%s", ss.str().c_str())
+#define ERROR_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; \
+  ERROR_EXPRESSION(expression, "%s", ss.str().c_str())
+#define FATAL_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; \
+  FATAL_EXPRESSION(expression, "%s", ss.str().c_str())
 
 /*
 #define LOGGER_INSTANCE(instance_name) \

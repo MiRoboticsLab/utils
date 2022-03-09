@@ -17,7 +17,7 @@ namespace cyberdog
 {
 namespace system
 {
-  // TODO
+// TODO
 }  // namespace system
 }  // namespace cyberdog
 

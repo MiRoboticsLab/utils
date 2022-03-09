@@ -53,7 +53,7 @@
 //             rcutils_reset_error();
 //             response->success = false;
 //         }
-//         response->success = true;        
+//         response->success = true;
 //     }
 
 // private:
@@ -68,18 +68,19 @@ std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::main_logger = nullptr;
 
 std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger()
 {
-    return main_logger == nullptr ? std::make_shared<rclcpp::Logger>(rclcpp::get_logger(UNINITIALIZED_NAME)):main_logger;
+  return main_logger ==
+         nullptr ? std::make_shared<rclcpp::Logger>(rclcpp::get_logger(UNINITIALIZED_NAME)) :
+         main_logger;
 }
 
-std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger(const char* sz_name)
+std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger(const char * sz_name)
 {
-    if(!main_logger)
-    {
-        CyberdogLogger cyberdog_logger(sz_name);
-        main_logger = cyberdog_logger.Get_Logger();
-        // std::string config_name = std::string(sz_name)+"_severity";
-        // static auto logger_config = std::make_shared<LoggerConfig>(config_name);
-        // rclcpp::spin(logger_config);
-    }
-    return main_logger;
+  if (!main_logger) {
+    CyberdogLogger cyberdog_logger(sz_name);
+    main_logger = cyberdog_logger.Get_Logger();
+    // std::string config_name = std::string(sz_name)+"_severity";
+    // static auto logger_config = std::make_shared<LoggerConfig>(config_name);
+    // rclcpp::spin(logger_config);
+  }
+  return main_logger;
 }
