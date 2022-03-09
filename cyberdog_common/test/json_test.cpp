@@ -21,11 +21,12 @@
  * @date 2022-01-26
  *
  */
+#include <string>
 #include <iostream>
 #include <algorithm>
 #include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_json.hpp"
-using namespace cyberdog::common;
+// using namespace cyberdog::common;
 
 TEST(hello, hello__Test)
 {
