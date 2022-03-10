@@ -26,9 +26,9 @@ add_library(cyberdog_log SHARED
   src/cyberdog_log.cpp)
 target_include_directories(cyberdog_log PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-$<INSTALL_INTERFACE:include>)  
+$<INSTALL_INTERFACE:include>)
 target_compile_definitions(cyberdog_log
-  PRIVATE "CYBERDOG_LOG_DLL")  
+  PRIVATE "CYBERDOG_LOG_DLL")
 ament_target_dependencies(
   cyberdog_log
   ${dependencies})
@@ -36,7 +36,7 @@ ament_target_dependencies(
 if(NOT WIN32)
   ament_environment_hooks(
     "${ament_cmake_package_templates_ENVIRONMENT_HOOK_LIBRARY_PATH}")
-endif()  
+endif()
 
 install(DIRECTORY include/
   DESTINATION include/)

@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CYBERDOG_COMMON__CYBERDOG_NODE_CYBERDOGNODE_HPP_
-#define CYBERDOG_COMMON__CYBERDOG_NODE_CYBERDOGNODE_HPP_
+#ifndef CYBERDOG_COMMON__CYBERDOG_NODE_HPP_
+#define CYBERDOG_COMMON__CYBERDOG_NODE_HPP_
 
+#include <string>
+#include <memory>
+#include <map>
 #include "rclcpp/rclcpp.hpp"
 #include "std_srvs/srv/set_bool.hpp"
 #include "cyberdog_log.hpp"
@@ -104,7 +107,7 @@ private:
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr srv_;
 };
 
-} // namespace common
-} // namespace cyberdog
+}  // namespace common
+}  // namespace cyberdog
 
-#endif
+#endif  // CYBERDOG_COMMON__CYBERDOG_NODE_HPP_

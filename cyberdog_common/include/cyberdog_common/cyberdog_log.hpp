@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CYBERDOG_COMMON__CYBERDOG_LOG_LOGGER_HPP_
-#define CYBERDOG_COMMON__CYBERDOG_LOG_LOGGER_HPP_
+#ifndef CYBERDOG_COMMON__CYBERDOG_LOG_HPP_
+#define CYBERDOG_COMMON__CYBERDOG_LOG_HPP_
 
+#include <memory>
+#include <string>
 #include "rclcpp/logger.hpp"
 #include "rclcpp/logging.hpp"
 
@@ -27,7 +29,7 @@ namespace common
 class CyberdogLogger final
 {
 public:
-  CyberdogLogger(const char * name)
+  explicit CyberdogLogger(const char * name)
   : logger_name(name)
   {
     logger = logger_name.empty() ?
@@ -48,7 +50,7 @@ public:
 private:
   std::string logger_name;
   std::shared_ptr<rclcpp::Logger> logger;
-}; // class CyberdogLogger
+};  // class CyberdogLogger
 
 class CyberdogLoggerFactory final
 {
@@ -58,10 +60,10 @@ public:
 
 private:
   static std::shared_ptr<rclcpp::Logger> main_logger;
-}; // class CyberdogLoggerFactory
+};  // class CyberdogLoggerFactory
 
-} // namespace common
-} // namespace cyberdog
+}  // namespace common
+}  // namespace cyberdog
 
 inline rclcpp::Logger get_logger()
 {
@@ -83,7 +85,8 @@ inline rclcpp::Logger get_logger()
 
 
 #define LOGGER_MAIN_INSTANCE(instance_name) \
-  std::shared_ptr<rclcpp::Logger> out_logger = cyberdog::common::CyberdogLoggerFactory::Get_Logger( \
+  std::shared_ptr<rclcpp::Logger> out_logger = \
+    cyberdog::common::CyberdogLoggerFactory::Get_Logger( \
     instance_name);
 
 #define DEBUG(...) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
@@ -136,10 +139,10 @@ inline rclcpp::Logger get_logger()
     get_logger(), expression, __VA_ARGS__)
 #define DEBUG_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; \
   DEBUG_EXPRESSION(expression, "%s", ss.str().c_str())
-#define INFO_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; INFO_EXPRESSION( \
-    expression, "%s", ss.str().c_str())
-#define WARN_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; WARN_EXPRESSION( \
-    expression, "%s", ss.str().c_str())
+#define INFO_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; \
+  INFO_EXPRESSION(expression, "%s", ss.str().c_str())
+#define WARN_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; \
+  WARN_EXPRESSION(expression, "%s", ss.str().c_str())
 #define ERROR_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; \
   ERROR_EXPRESSION(expression, "%s", ss.str().c_str())
 #define FATAL_STREAM_EXPRESSION(expression, args) std::stringstream ss; ss << args; \
@@ -151,4 +154,4 @@ inline rclcpp::Logger get_logger()
         std::shared_ptr<rclcpp::Logger> out_logger = cyberdog_logger.Get_Logger();
 */
 
-#endif
+#endif  // CYBERDOG_COMMON__CYBERDOG_LOG_HPP_
