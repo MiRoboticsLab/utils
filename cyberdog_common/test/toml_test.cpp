@@ -23,7 +23,7 @@
 #include <algorithm>
 #include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_toml.hpp"
-using namespace cyberdog::common;
+using cyberdog::common::CyberdogToml;
 
 TEST(hello, hello__Test)
 {

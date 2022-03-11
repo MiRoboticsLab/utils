@@ -23,9 +23,11 @@
  */
 #include <iostream>
 #include <algorithm>
+#include <string>
 #include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_json.hpp"
-using namespace cyberdog::common;
+using cyberdog::common::CyberdogJson;
+namespace json = rapidjson;
 
 TEST(hello, hello__Test)
 {

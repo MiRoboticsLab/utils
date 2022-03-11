@@ -16,13 +16,13 @@
 
 TEST(cyberdoglog, test1)
 {
-    INFO("cyberdog log test1");
+  INFO("cyberdog log test1");
 }
 
 TEST(cyberdoglog, test2)
 {
-    LOGGER_MAIN_INSTANCE("test2");
-    INFO("cyberdog log test2");
+  LOGGER_MAIN_INSTANCE("test2");
+  INFO("cyberdog log test2");
 }
 
 
