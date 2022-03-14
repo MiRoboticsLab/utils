@@ -14,6 +14,39 @@
 #include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_log.hpp"
 
+bool test()
+{
+  static int i = 0;
+  return (++i) % 2;
+}
+
+class CustomClass
+{
+public:
+  CustomClass()
+  {
+    INFO("CustomClass has own namespace.");
+    INFO_STREAM("CustomClass start " << 22 << 33 << " end");
+  }
+  void output()
+  {
+    int num = 2;
+    DEBUG_EXPRESSION(num % 2 == 0, "CustomClass debug");
+    INFO_EXPRESSION(num % 2 == 1, "CustomClass info");
+    WARN_EXPRESSION(num % 2 == 0, "CustomClass warn");
+    ERROR_EXPRESSION(num % 2 == 1, "CustomClass error");
+    FATAL_EXPRESSION(num % 2 == 0, "CustomClass fatal");
+    DEBUG_STREAM_EXPRESSION(num % 2 == 1, "CustomClass debug" << "stream");
+    INFO_STREAM_EXPRESSION(num % 2 == 0, "CustomClass info" << "stream");
+    WARN_STREAM_EXPRESSION(num % 2 == 1, "CustomClass warn" << "stream");
+    ERROR_STREAM_EXPRESSION(num % 2 == 0, "CustomClass error" << "stream");
+    FATAL_STREAM_EXPRESSION(num % 2 == 1, "CustomClass fatal" << "stream");
+  }
+
+private:
+  LOGGER_MINOR_INSTANCE("CustomClass");
+};
+
 TEST(cyberdoglog, test1)
 {
   INFO("cyberdog log test1");
@@ -25,6 +58,65 @@ TEST(cyberdoglog, test2)
   INFO("cyberdog log test2");
 }
 
+TEST(cyberdoglog, test3)
+{
+  DEBUG("cyberdog log test3 debug");
+  WARN("cyberdog log test3 warn");
+  ERROR("cyberdog log test3 error");
+  FATAL("cyberdog log test3 fatal");
+}
+
+TEST(cyberdoglog, test4)
+{
+  for (auto i = 0; i < 10; ++i) {
+    DEBUG_ONCE("cyberdog log test4 debug");
+    INFO_ONCE("cyberdog log test4 info");
+    WARN_ONCE("cyberdog log test4 warn");
+    ERROR_ONCE("cyberdog log test4 error");
+    FATAL_ONCE("cyberdog log test4 fatal");
+    DEBUG_STREAM_ONCE("cyberdog log test4 debug" << "stream");
+    INFO_STREAM_ONCE("cyberdog log test4 info" << "stream");
+    WARN_STREAM_ONCE("cyberdog log test4 warn" << "stream");
+    ERROR_STREAM_ONCE("cyberdog log test4 error" << "stream");
+    FATAL_STREAM_ONCE("cyberdog log test4 fatal" << "stream");
+  }
+}
+
+TEST(cyberdoglog, test5)
+{
+  CustomClass cc;
+  cc.output();
+}
+
+TEST(cyberdoglog, test6)
+{
+  DEBUG_FUNCTION(test, "test6 debug");
+  INFO_FUNCTION(test, "test6 info");
+  WARN_FUNCTION(test, "test6 warn");
+  ERROR_FUNCTION(test, "test6 error");
+  FATAL_FUNCTION(test, "test6 fatal");
+  DEBUG_STREAM_FUNCTION(test, "test6 debug" << "stream");
+  INFO_STREAM_FUNCTION(test, "test6 info" << "stream");
+  WARN_STREAM_FUNCTION(test, "test6 warn" << "stream");
+  ERROR_STREAM_FUNCTION(test, "test6 error" << "stream");
+  FATAL_STREAM_FUNCTION(test, "test6 fatal" << "stream");
+}
+
+TEST(cyberdoglog, test7)
+{
+  for (auto i = 0; i < 2; ++i) {
+    DEBUG("cyberdog log test7 debug");
+    INFO("cyberdog log test7 info");
+    WARN("cyberdog log test7 warn");
+    ERROR("cyberdog log test7 error");
+    FATAL("cyberdog log test7 fatal");
+    DEBUG_STREAM("cyberdog log test7 debug" << "stream");
+    INFO_STREAM("cyberdog log test7 info" << "stream");
+    WARN_STREAM("cyberdog log test7 warn" << "stream");
+    ERROR_STREAM("cyberdog log test7 error" << "stream");
+    FATAL_STREAM("cyberdog log test7 fatal" << "stream");
+  }
+}
 
 int main(int argc, char ** argv)
 {
