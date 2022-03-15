@@ -13,12 +13,16 @@ find_package(rapidjson REQUIRED)
 find_package(toml REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_srvs REQUIRED)
+find_package(lcm REQUIRED)
+find_package(xpack REQUIRED)
 
 set(dependencies
   toml
   rapidjson
   rclcpp
   std_srvs
+  lcm
+  xpack
 )
 
 add_library(cyberdog_log SHARED
@@ -54,19 +58,26 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
   include_directories(include)
+  include_directories(test)
   ament_add_gtest(jsontest test/json_test.cpp)
   ament_add_gtest(tomltest test/toml_test.cpp)
   ament_add_gtest(logtest test/log_test.cpp src/cyberdog_log.cpp)
+  ament_add_gtest(lcmtest test/lcm_test.cpp)
+  target_link_libraries(lcmtest lcm)
   target_compile_definitions(tomltest PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
   target_compile_definitions(jsontest PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
   ament_target_dependencies(tomltest rclcpp toml)
   ament_target_dependencies(jsontest rclcpp rapidjson)
   ament_target_dependencies(logtest rclcpp)
+  ament_target_dependencies(lcmtest rclcpp xpack)
   install(TARGETS
-    jsontest tomltest logtest
+    jsontest tomltest logtest lcmtest
     DESTINATION lib/${PROJECT_NAME})
   install(FILES
-    test/benchmark.toml test/benchmark.json
+    test/benchmark.toml test/benchmark.json test/test_cs.lcm
+    DESTINATION lib/${PROJECT_NAME})
+  install(DIRECTORY
+    test/lcmtestcs test/structor
     DESTINATION lib/${PROJECT_NAME})
   ament_lint_auto_find_test_dependencies()
 endif()
