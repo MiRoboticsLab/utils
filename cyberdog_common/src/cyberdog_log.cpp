@@ -28,9 +28,34 @@ std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger()
          main_logger;
 }
 
+static void handler(int signum, siginfo_t * info, void * context)
+{
+  (void)context;
+  if(signum == SIGINT)
+    INFO("SIGINT signal: %d,content:(%d %d)",
+      signum, info->si_int, info->si_value.sival_int);
+  else if(signum == SIGTSTP)
+    INFO("SIGTSTP signal: %d,content:(%d %d)",
+      signum, info->si_int, info->si_value.sival_int);
+  else if(signum == SIGQUIT)
+    INFO("SIGQUIT signal: %d,content:(%d %d)",
+    signum, info->si_int, info->si_value.sival_int);
+  else if(signum == SIGFPE)
+    INFO("SIGFPE signal: %d,content:(%d %d)",
+    signum, info->si_int, info->si_value.sival_int);
+  exit(0);
+}
+
 std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger(const char * sz_name)
 {
   if (!main_logger) {
+    struct sigaction act;
+    act.sa_sigaction = handler;
+    act.sa_flags = SA_SIGINFO;
+    sigaction(SIGINT, &act, NULL);
+    sigaction(SIGTSTP, &act, NULL);
+    sigaction(SIGQUIT, &act, NULL);
+    sigaction(SIGFPE, &act, NULL);
     CyberdogLogger cyberdog_logger(sz_name);
     main_logger = cyberdog_logger.Get_Logger();
   }
