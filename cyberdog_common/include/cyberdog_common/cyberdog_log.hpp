@@ -100,48 +100,38 @@ inline rclcpp::Logger get_logger()
 #define WARN(...) RCLCPP_WARN(get_logger(), __VA_ARGS__)
 #define ERROR(...) RCLCPP_ERROR(get_logger(), __VA_ARGS__)
 #define FATAL(...) RCLCPP_FATAL(get_logger(), __VA_ARGS__)
-#define DEBUG_STREAM(args) do {std::stringstream ss; ss << args; \
-    DEBUG("%s", ss.str().c_str());} while (0)
-#define INFO_STREAM(args) do {std::stringstream ss; ss << args; \
-    INFO("%s", ss.str().c_str());} while (0)
-#define WARN_STREAM(args) do {std::stringstream ss; ss << args; \
-    WARN("%s", ss.str().c_str());} while (0)
-#define ERROR_STREAM(args) do {std::stringstream ss; ss << args; \
-    ERROR("%s", ss.str().c_str());} while (0)
-#define FATAL_STREAM(args) do {std::stringstream ss; ss << args; \
-    FATAL("%s", ss.str().c_str());} while (0)
+#define DEBUG_STREAM(...) RCLCPP_DEBUG_STREAM(get_logger(), __VA_ARGS__)
+#define INFO_STREAM(...) RCLCPP_INFO_STREAM(get_logger(), __VA_ARGS__)
+#define WARN_STREAM(...) RCLCPP_WARN_STREAM(get_logger(), __VA_ARGS__)
+#define ERROR_STREAM(...) RCLCPP_ERROR_STREAM(get_logger(), __VA_ARGS__)
+#define FATAL_STREAM(...) RCLCPP_FATAL_STREAM(get_logger(), __VA_ARGS__)
 
 #define DEBUG_ONCE(...) RCLCPP_DEBUG_ONCE(get_logger(), __VA_ARGS__)
 #define INFO_ONCE(...) RCLCPP_INFO_ONCE(get_logger(), __VA_ARGS__)
 #define WARN_ONCE(...) RCLCPP_WARN_ONCE(get_logger(), __VA_ARGS__)
 #define ERROR_ONCE(...) RCLCPP_ERROR_ONCE(get_logger(), __VA_ARGS__)
 #define FATAL_ONCE(...) RCLCPP_FATAL_ONCE(get_logger(), __VA_ARGS__)
-#define DEBUG_STREAM_ONCE(args) do {std::stringstream ss; ss << args; \
-    DEBUG_ONCE("%s", ss.str().c_str());} while (0)
-#define INFO_STREAM_ONCE(args) do {std::stringstream ss; ss << args; \
-    INFO_ONCE("%s", ss.str().c_str());} while (0)
-#define WARN_STREAM_ONCE(args) do {std::stringstream ss; ss << args; \
-    WARN_ONCE("%s", ss.str().c_str());} while (0)
-#define ERROR_STREAM_ONCE(args) do {std::stringstream ss; ss << args; \
-    ERROR_ONCE("%s", ss.str().c_str());} while (0)
-#define FATAL_STREAM_ONCE(args) do {std::stringstream ss; ss << args; \
-    FATAL_ONCE("%s", ss.str().c_str());} while (0)
+#define DEBUG_STREAM_ONCE(...) RCLCPP_DEBUG_STREAM_ONCE(get_logger(), __VA_ARGS__)
+#define INFO_STREAM_ONCE(...) RCLCPP_INFO_STREAM_ONCE(get_logger(), __VA_ARGS__)
+#define WARN_STREAM_ONCE(...) RCLCPP_WARN_STREAM_ONCE(get_logger(), __VA_ARGS__)
+#define ERROR_STREAM_ONCE(...) RCLCPP_ERROR_STREAM_ONCE(get_logger(), __VA_ARGS__)
+#define FATAL_STREAM_ONCE(...) RCLCPP_FATAL_STREAM_ONCE(get_logger(), __VA_ARGS__)
 
 #define DEBUG_FUNCTION(function, ...) RCLCPP_DEBUG_FUNCTION(get_logger(), function, __VA_ARGS__)
 #define INFO_FUNCTION(function, ...) RCLCPP_INFO_FUNCTION(get_logger(), function, __VA_ARGS__)
 #define WARN_FUNCTION(function, ...) RCLCPP_WARN_FUNCTION(get_logger(), function, __VA_ARGS__)
 #define ERROR_FUNCTION(function, ...) RCLCPP_ERROR_FUNCTION(get_logger(), function, __VA_ARGS__)
 #define FATAL_FUNCTION(function, ...) RCLCPP_FATAL_FUNCTION(get_logger(), function, __VA_ARGS__)
-#define DEBUG_STREAM_FUNCTION(function, args) do {std::stringstream ss; ss << args; \
-    DEBUG_FUNCTION(function, "%s", ss.str().c_str());} while (0)
-#define INFO_STREAM_FUNCTION(function, args) do {std::stringstream ss; ss << args; \
-    INFO_FUNCTION(function, "%s", ss.str().c_str());} while (0)
-#define WARN_STREAM_FUNCTION(function, args) do {std::stringstream ss; ss << args; \
-    WARN_FUNCTION(function, "%s", ss.str().c_str());} while (0)
-#define ERROR_STREAM_FUNCTION(function, args) do {std::stringstream ss; ss << args; \
-    ERROR_FUNCTION(function, "%s", ss.str().c_str());} while (0)
-#define FATAL_STREAM_FUNCTION(function, args) do {std::stringstream ss; ss << args; \
-    FATAL_FUNCTION(function, "%s", ss.str().c_str());} while (0)
+#define DEBUG_STREAM_FUNCTION(function, ...) RCLCPP_DEBUG_STREAM_FUNCTION( \
+    get_logger(), function, __VA_ARGS__)
+#define INFO_STREAM_FUNCTION(function, ...) RCLCPP_INFO_STREAM_FUNCTION( \
+    get_logger(), function, __VA_ARGS__)
+#define WARN_STREAM_FUNCTION(function, ...) RCLCPP_WARN_STREAM_FUNCTION( \
+    get_logger(), function, __VA_ARGS__)
+#define ERROR_STREAM_FUNCTION(function, ...) RCLCPP_ERROR_STREAM_FUNCTION( \
+    get_logger(), function, __VA_ARGS__)
+#define FATAL_STREAM_FUNCTION(function, ...) RCLCPP_FATAL_STREAM_FUNCTION( \
+    get_logger(), function, __VA_ARGS__)
 
 #define DEBUG_EXPRESSION(expression, ...) RCLCPP_DEBUG_EXPRESSION( \
     get_logger(), expression, __VA_ARGS__)
@@ -153,16 +143,38 @@ inline rclcpp::Logger get_logger()
     get_logger(), expression, __VA_ARGS__)
 #define FATAL_EXPRESSION(expression, ...) RCLCPP_FATAL_EXPRESSION( \
     get_logger(), expression, __VA_ARGS__)
-#define DEBUG_STREAM_EXPRESSION(expression, args) do {std::stringstream ss; ss << args; \
-    DEBUG_EXPRESSION(expression, "%s", ss.str().c_str());} while (0)
-#define INFO_STREAM_EXPRESSION(expression, args) do {std::stringstream ss; ss << args; \
-    INFO_EXPRESSION(expression, "%s", ss.str().c_str());} while (0)
-#define WARN_STREAM_EXPRESSION(expression, args) do {std::stringstream ss; ss << args; \
-    WARN_EXPRESSION(expression, "%s", ss.str().c_str());} while (0)
-#define ERROR_STREAM_EXPRESSION(expression, args) do {std::stringstream ss; ss << args; \
-    ERROR_EXPRESSION(expression, "%s", ss.str().c_str());} while (0)
-#define FATAL_STREAM_EXPRESSION(expression, args) do {std::stringstream ss; ss << args; \
-    FATAL_EXPRESSION(expression, "%s", ss.str().c_str());} while (0)
+#define DEBUG_STREAM_EXPRESSION(expression, ...) RCLCPP_DEBUG_STREAM_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define INFO_STREAM_EXPRESSION(expression, ...) RCLCPP_INFO_STREAM_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define WARN_STREAM_EXPRESSION(expression, ...) RCLCPP_WARN_STREAM_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define ERROR_STREAM_EXPRESSION(expression, ...) RCLCPP_ERROR_STREAM_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define FATAL_STREAM_EXPRESSION(expression, ...) RCLCPP_FATAL_STREAM_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+
+extern rclcpp::Clock global_steady_clock;
+#define DEBUG_MILLSECONDS(millseconds, ...) RCLCPP_DEBUG_THROTTLE( \
+    get_logger(), global_steady_clock, millseconds, __VA_ARGS__)
+#define INFO_MILLSECONDS(millseconds, ...) RCLCPP_INFO_THROTTLE( \
+    get_logger(), global_steady_clock, millseconds, __VA_ARGS__)
+#define WARN_MILLSECONDS(millseconds, ...) RCLCPP_WARN_THROTTLE( \
+    get_logger(), global_steady_clock, millseconds, __VA_ARGS__)
+#define ERROR_MILLSECONDS(millseconds, ...) RCLCPP_ERROR_THROTTLE( \
+    get_logger(), global_steady_clock, millseconds, __VA_ARGS__)
+#define FATAL_MILLSECONDS(millseconds, ...) RCLCPP_FATAL_THROTTLE( \
+    get_logger(), global_steady_clock, millseconds, __VA_ARGS__)
+#define DEBUG_STREAM_MILLSECONDS(millseconds, ...) RCLCPP_DEBUG_STREAM_THROTTLE( \
+    get_logger(), global_steady_clock, millseconds, __VA_ARGS__)
+#define INFO_STREAM_MILLSECONDS(millseconds, ...) RCLCPP_INFO_STREAM_THROTTLE( \
+    get_logger(), global_steady_clock, millseconds, __VA_ARGS__)
+#define WARN_STREAM_MILLSECONDS(millseconds, ...) RCLCPP_WARN_STREAM_THROTTLE( \
+    get_logger(), global_steady_clock, millseconds, __VA_ARGS__)
+#define ERROR_STREAM_MILLSECONDS(millseconds, ...) RCLCPP_ERROR_STREAM_THROTTLE( \
+    get_logger(), global_steady_clock, millseconds, __VA_ARGS__)
+#define FATAL_STREAM_MILLSECONDS(millseconds, ...) RCLCPP_FATAL_STREAM_THROTTLE( \
+    get_logger(), global_steady_clock, millseconds, __VA_ARGS__)
 
 class CyberdogLoggerLever final
 {

@@ -10,8 +10,10 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
+// limitations under the License.
 #ifndef CYBERDOG_COMMON__CYBERDOG_LCM_HPP_
 #define CYBERDOG_COMMON__CYBERDOG_LCM_HPP_
+#include <lcm/lcm-cpp.hpp>
 #include <memory>
 #include <string>
 #include <mutex>
@@ -19,7 +21,6 @@
 #include <condition_variable>
 #include <functional>
 #include <atomic>
-#include <lcm/lcm-cpp.hpp>
 
 namespace cyberdog
 {
@@ -186,6 +187,6 @@ private:
   std::function<void(const Req &, Res &)> callback_;
 };  // class LcmServer
 
-}  // namejspace common
+}  // namespace common
 }  // namespace cyberdog
 #endif  // CYBERDOG_COMMON__CYBERDOG_LCM_HPP_

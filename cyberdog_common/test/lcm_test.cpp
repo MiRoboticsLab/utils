@@ -10,13 +10,16 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
+// limitations under the License.
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <string>
+#include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_lcm.hpp"
 #include "lcmtestcs/lcmtestcs.hpp"
-#include "structor/data.h"
-#include "backtrace.h"
+#include "structor/data.hpp"
+// #include "backtrace.h"
 
 void client_thread_function()
 {
@@ -88,14 +91,15 @@ int main(int argc, char ** argv)
   // signal(SIGSEGV, signal_handler);
   // signal(SIGABRT, signal_handler);
 
-  std::thread server_thread = std::thread(server_thread_function);
-  std::thread client_thread = std::thread(client_thread_function);
+  // std::thread server_thread = std::thread(server_thread_function);
+  // std::thread client_thread = std::thread(client_thread_function);
 
-  if (client_thread.joinable()) {
-    client_thread.join();
-  }
-  if (server_thread.joinable()) {
-    server_thread.join();
-  }
-  return 0;
+  // if (client_thread.joinable()) {
+  //   client_thread.join();
+  // }
+  // if (server_thread.joinable()) {
+  //   server_thread.join();
+  // }
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

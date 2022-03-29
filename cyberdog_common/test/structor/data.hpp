@@ -10,7 +10,13 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
+// limitations under the License.
+#ifndef STRUCTOR__DATA_HPP_
+#define STRUCTOR__DATA_HPP_
+
+#include <string>
 #include "xpack/json.h"
+
 
 struct lcm_data_1
 {
@@ -19,7 +25,7 @@ struct lcm_data_1
   double c;
   float d[20];
   float e[10];
-  XPACK(O(a, b, c, d, e));
+  XPACK(O(a, b, c, d, e))
 };
 
 
@@ -30,18 +36,20 @@ struct lcm_data_2
   double c;
   float d[10];
   float e[20];
-  XPACK(O(a, b, c, e));
+  XPACK(O(a, b, c, e))
 };
 struct lcm_request_data
 {
   std::string name;
   int8_t id;
-  XPACK(O(name, id));
+  XPACK(O(name, id))
 };
 
 struct lcm_response_data
 {
   std::string name;
   bool result;
-  XPACK(O(name, result));
+  XPACK(O(name, result))
 };
+
+#endif  // STRUCTOR__DATA_HPP_
