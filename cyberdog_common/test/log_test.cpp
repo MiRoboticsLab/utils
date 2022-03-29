@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#include <chrono>
 #include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_log.hpp"
 
@@ -54,7 +55,7 @@ TEST(cyberdoglog, test1)
 
 TEST(cyberdoglog, test2)
 {
-  LOGGER_MAIN_INSTANCE("test2");
+  LOGGER_MAIN_INSTANCE("test");
   INFO("cyberdog log test2");
 }
 
@@ -116,6 +117,32 @@ TEST(cyberdoglog, test7)
     ERROR_STREAM("cyberdog log test7 error" << "stream");
     FATAL_STREAM("cyberdog log test7 fatal" << "stream");
   }
+}
+
+TEST(cyberdoglog, test8)
+{
+  auto func_ = [] {
+      auto last_clock = std::chrono::high_resolution_clock::now();
+      auto current_clock = last_clock;
+      while ((std::chrono::duration_cast<std::chrono::milliseconds>(
+          current_clock -
+          last_clock).count()) < 5050)
+      {
+        current_clock = std::chrono::high_resolution_clock::now();
+        DEBUG_MILLSECONDS(1000, "cyberdog log test8 debug");
+        INFO_MILLSECONDS(100, "cyberdog log test8 info");
+        WARN_MILLSECONDS(200, "cyberdog log test8 warn");
+        ERROR_MILLSECONDS(300, "cyberdog log test8 error");
+        FATAL_MILLSECONDS(500, "cyberdog log test8 fatal");
+        DEBUG_STREAM_MILLSECONDS(1000, "cyberdog log test8 debug" << "stream");
+        INFO_STREAM_MILLSECONDS(100, "cyberdog log test8 info" << "stream");
+        WARN_STREAM_MILLSECONDS(200, "cyberdog log test8 warn" << "stream");
+        ERROR_STREAM_MILLSECONDS(300, "cyberdog log test8 error" << "stream");
+        FATAL_STREAM_MILLSECONDS(500, "cyberdog log test8 fatal" << "stream");
+      }
+    };
+  std::thread t1(func_);
+  t1.join();
 }
 
 int main(int argc, char ** argv)

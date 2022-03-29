@@ -20,6 +20,7 @@ using cyberdog::common::CyberdogLogger;
 using cyberdog::common::CyberdogLoggerFactory;
 
 std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::main_logger = nullptr;
+rclcpp::Clock global_steady_clock = rclcpp::Clock();
 
 std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger()
 {

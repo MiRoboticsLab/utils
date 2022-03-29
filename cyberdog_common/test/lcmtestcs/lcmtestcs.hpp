@@ -10,8 +10,9 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-#ifndef __lcmtestcs_lcmtestcs_hpp__
-#define __lcmtestcs_lcmtestcs_hpp__
+// limitations under the License.
+#ifndef LCMTESTCS__LCMTESTCS_HPP_
+#define LCMTESTCS__LCMTESTCS_HPP_
 
 #include <lcm/lcm_coretypes.h>
 
@@ -175,6 +176,6 @@ uint64_t lcmtestcs::_computeHash(const __lcm_hash_ptr *)
   return (hash << 1) + ((hash >> 63) & 1);
 }
 
-}
+}  // namespace lcmtestcs
 
-#endif
+#endif  // LCMTESTCS__LCMTESTCS_HPP_
