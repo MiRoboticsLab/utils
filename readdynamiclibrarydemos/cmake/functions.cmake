@@ -3,11 +3,22 @@ include(FindPkgConfig)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
+include(${CMAKE_CURRENT_LIST_DIR}/FindCython.cmake)
 find_package(PythonInterp 3 REQUIRED)
-find_package(Cython REQUIRED)
+# find_package(Cython REQUIRED)
+message('111-------------222')
+message('${CMAKE_CURRENT_LIST_DIR}')
+message('111-------------222')
+# include("${PROJECT_SOURCE_DIR}/cmake/FindCython.cmake")
+
+
+message('111-------------222')
+message('${PROJECT_SOURCE_DIR}')
+message('111-------------222')
 
 file(GLOB_RECURSE ALL_CONFIG_TOML_FILES "${PROJECT_SOURCE_DIR}/*.toml")
-file(GLOB_RECURSE ALL_CONFIG_SCRIPTS_FILES "${PROJECT_SOURCE_DIR}/*.py")
+# file(GLOB_RECURSE ALL_CONFIG_SCRIPTS_FILES "${PROJECT_SOURCE_DIR}/*.py")
+file(GLOB_RECURSE ALL_CONFIG_SCRIPTS_FILES "${CMAKE_CURRENT_LIST_DIR}/../scripts/*.py")
 
 function(project_initialize_config_parameter)
     foreach(ABS_FIL ${ALL_CONFIG_TOML_FILES})
@@ -27,15 +38,23 @@ macro(generate_parameter_dynamic_library FILENAME MODULE)
             ${PROJECT_BINARY_DIR}
     )
 
+# message('333-------------222')
+# message('${PROJECT_SOURCE_DIR}')
+# message('filename:${FILENAME}')
+# message('${PROJECT_BINARY_DIR}')
+# message('${ALL_CONFIG_SCRIPTS_FILES}')
+# message('333-------------222')
+
+
     execute_process(
         COMMAND
-            cp ${FILENAME} ${PROJECT_BINARY_DIR}/config
+            cp ${FILENAME} ${PROJECT_BINARY_DIR}
         COMMAND
-            cp ${ALL_CONFIG_SCRIPTS_FILES} ${PROJECT_BINARY_DIR}/config -R
+            cp ${ALL_CONFIG_SCRIPTS_FILES} ${PROJECT_BINARY_DIR} -R
         COMMAND
             python3 setup.py build_ext --inplace
         WORKING_DIRECTORY
-            ${PROJECT_BINARY_DIR}/config
+            ${PROJECT_BINARY_DIR}
     )
 
     execute_process(
@@ -44,6 +63,28 @@ macro(generate_parameter_dynamic_library FILENAME MODULE)
         WORKING_DIRECTORY
             ${PROJECT_BINARY_DIR}/config
     )
+    # message('kkkkkkkkkkkkkk:: ${PROJECT_BINARY_DIR}/test_toml.so')
+    # message('tttttttttttttt:: ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/')
+    execute_process(
+        COMMAND
+            mkdir -p ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}      
+        COMMAND
+          cp ${PROJECT_BINARY_DIR}/test_toml.so ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/
+        WORKING_DIRECTORY
+            ${PROJECT_BINARY_DIR}
+    )    
+    # execute_process(
+    #     COMMAND
+    #         cp ${FILENAME} ${PROJECT_BINARY_DIR}
+    #     COMMAND
+    #         cp ${ALL_CONFIG_SCRIPTS_FILES} ${PROJECT_BINARY_DIR} -R
+    #     COMMAND
+    #         python3 setup.py build_ext --inplace
+    #     COMMAND
+    #         rm -rf config/build
+    #     WORKING_DIRECTORY
+    #         ${PROJECT_BINARY_DIR}
+    # )
 endmacro()
 
 
