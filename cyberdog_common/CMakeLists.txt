@@ -56,6 +56,10 @@ install(
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+if(LOCAL_BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   include_directories(include)
   include_directories(test)
@@ -79,7 +83,6 @@ if(BUILD_TESTING)
   install(DIRECTORY
     test/lcmtestcs test/structor
     DESTINATION lib/${PROJECT_NAME})
-  ament_lint_auto_find_test_dependencies()
 endif()
 
 ament_export_include_directories(include)
