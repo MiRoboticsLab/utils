@@ -8,7 +8,9 @@
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <build_depend>cppdemos</build_depend>
+  <!-- <build_depend>cyberdog_parameter</build_depend> -->
+  <depend>cyberdog_parameter</depend>
+  <depend>cyberdog_common</depend>
   <depend>toml</depend>
 
   <test_depend>ament_lint_auto</test_depend>

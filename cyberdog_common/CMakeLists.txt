@@ -16,6 +16,7 @@ find_package(rclcpp REQUIRED)
 add_library(cyberdog_log SHARED
   include/cyberdog_common/cyberdog_log.hpp
   src/cyberdog_log.cpp)
+
 target_include_directories(cyberdog_log PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<INSTALL_INTERFACE:include>)  
@@ -26,6 +27,7 @@ ament_target_dependencies(
   PUBLIC
   toml
   rclcpp)
+
 
 if(NOT WIN32)
   ament_environment_hooks(

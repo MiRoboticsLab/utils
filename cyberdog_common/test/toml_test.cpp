@@ -43,6 +43,13 @@ TEST(file, parser)
 
 TEST(reader, table)
 {
+
+//   [a]
+// a = 1
+// b = "cyberdog"
+// c = true
+// d = 0.1
+
   toml::value value;
   if (!CyberdogToml::ParseFile(std::string(BenchmarkPath) + "/benchmark.toml", value)) {
     return;
