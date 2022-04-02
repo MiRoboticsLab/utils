@@ -25,15 +25,6 @@ set(dependencies
   xpack
 )
 
-add_executable(dktest include/cyberdog_common/config_test.cpp)
-# find_library(config_test include/cyberdog_common)
-target_link_libraries(dktest "/home/dukun/workspace/cyberdog_ws/utils/cyberdog_common/include/cyberdog_common/libconfig_test.so")
-ament_target_dependencies(dktest rclcpp toml)
-install(
-  TARGETS dktest
-  DESTINATION lib/${PROJECT_NAME}
-)
-
 add_library(cyberdog_log SHARED
   include/cyberdog_common/cyberdog_log.hpp
   src/cyberdog_log.cpp)
