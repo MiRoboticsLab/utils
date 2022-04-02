@@ -27,6 +27,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
+#include "cyberdog_common/cyberdog_log.hpp"
 
 namespace cyberdog
 {
@@ -42,6 +43,8 @@ namespace json = rapidjson;
  */
 class CyberdogJson final
 {
+  LOGGER_MINOR_INSTANCE("CyberdogJson");
+
 public:
   CyberdogJson() {}
   ~CyberdogJson() {}
@@ -62,8 +65,8 @@ public:
   static bool Add(json::Document & doc, const std::string & keyName, const int value)
   {
     if (!doc.IsObject()) {
-      fprintf(
-        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+      ERROR(
+        "[%s] failed! Input doc should be json::kObjectType.\n",
         __func__);
       return false;
     }
@@ -81,8 +84,8 @@ public:
   static bool Add(json::Document & doc, const std::string & keyName, const uint64_t value)
   {
     if (!doc.IsObject()) {
-      fprintf(
-        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+      ERROR(
+        "[%s] failed! Input doc should be json::kObjectType.\n",
         __func__);
       return false;
     }
@@ -100,8 +103,8 @@ public:
   static bool Add(json::Document & doc, const std::string & keyName, const double value)
   {
     if (!doc.IsObject()) {
-      fprintf(
-        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+      ERROR(
+        "[%s] failed! Input doc should be json::kObjectType.\n",
         __func__);
       return false;
     }
@@ -119,8 +122,8 @@ public:
   static bool Add(json::Document & doc, const std::string & keyName, const float value)
   {
     if (!doc.IsObject()) {
-      fprintf(
-        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+      ERROR(
+        "[%s] failed! Input doc should be json::kObjectType.\n",
         __func__);
       return false;
     }
@@ -140,8 +143,8 @@ public:
     const std::string value)
   {
     if (!doc.IsObject()) {
-      fprintf(
-        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+      ERROR(
+        "[%s] failed! Input doc should be json::kObjectType.\n",
         __func__);
       return false;
     }
@@ -160,8 +163,8 @@ public:
   static bool Add(json::Document & doc, const std::string & keyName, const char * value)
   {
     if (!doc.IsObject()) {
-      fprintf(
-        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+      ERROR(
+        "[%s] failed! Input doc should be json::kObjectType.\n",
         __func__);
       return false;
     }
@@ -180,8 +183,8 @@ public:
   static bool Add(json::Document & doc, const std::string & keyName, const bool value)
   {
     if (!doc.IsObject()) {
-      fprintf(
-        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+      ERROR(
+        "[%s] failed! Input doc should be json::kObjectType.\n",
         __func__);
       return false;
     }
@@ -201,8 +204,8 @@ public:
     json::Value & value)
   {
     if (!doc.IsObject()) {
-      fprintf(
-        stderr, "[CyberdogJson][%s] failed! Input doc should be json::kObjectType.\n",
+      ERROR(
+        "[%s] failed! Input doc should be json::kObjectType.\n",
         __func__);
       return false;
     }
@@ -227,7 +230,7 @@ public:
   {
     bool ret = true;
     if (!doc.IsArray()) {
-      fprintf(stderr, "[CyberdogJson][%s] failed! Doc shouled be json::kArrayType.\n", __func__);
+      ERROR("[%s] failed! Doc shouled be json::kArrayType.\n", __func__);
       ret = false;
     } else {
       json::Document::AllocatorType & allocator = doc.GetAllocator();
@@ -242,7 +245,7 @@ public:
   {
     bool ret = true;
     if (!doc.IsArray()) {
-      fprintf(stderr, "[CyberdogJson][%s] failed! Doc shouled be json::kArrayType.\n", __func__);
+      ERROR("[%s] failed! Doc shouled be json::kArrayType.\n", __func__);
       ret = false;
     } else {
       json::Document::AllocatorType & allocator = doc.GetAllocator();
@@ -269,13 +272,13 @@ public:
   {
     bool ret = true;
     if (str.empty()) {
-      fprintf(stderr, "[CyberdogJson][%s]: failed! Input string shouled not be empty.\n", __func__);
+      ERROR("[%s]: failed! Input string shouled not be empty.\n", __func__);
       ret = false;
     } else {
       doc.Parse<0>(str.c_str());
       if (doc.HasParseError()) {
-        fprintf(
-          stderr, "[CyberdogJson][%s]: failed! Doc parse error with input:\n\t%s\n ",
+        ERROR(
+          "[%s]: failed! Doc parse error with input:\n\t%s",
           __func__, str.c_str());
         ret = false;
       }
@@ -297,9 +300,8 @@ public:
   static bool Document2String(const json::Document & doc, std::string & str)
   {
     if (!doc.IsObject() && !doc.IsArray()) {
-      fprintf(
-        stderr,
-        "[CyberdogJson][%s]: failed! Input document shouled kObjectType or kArrayType.\n",
+      ERROR(
+        "[%s]: failed! Input document shouled kObjectType or kArrayType.",
         __func__);
       return false;
     }
@@ -361,14 +363,14 @@ public:
     if (ReadFile(jsonFileName, jsonStr)) {
       doc.Parse<0>(jsonStr.c_str());
       if (doc.HasParseError()) {
-        fprintf(stderr, "[CyberdogJson][%s] Failed! HasParseError!\n", __func__);
+        ERROR("[%s] Failed! HasParseError!\n", __func__);
         return false;
       } else {
         return true;
       }
     } else {
-      fprintf(
-        stderr, "[CyberdogJson][%s] Failed! Cannot read file!\n%s\n", __func__,
+      ERROR(
+        "[%s] Failed! Cannot read file!\n%s\n", __func__,
         jsonFileName.c_str());
       return false;
     }
@@ -398,12 +400,12 @@ public:
         int wr_len = msg_size - len;
         n = write(fd, msg.c_str() + len, wr_len);
         if (n < 0) {
-          fprintf(stdout, "[CyberdogJson][%s]Write OK!\n", __func__);
+          INFO("[CyberdogJson][%s]Write OK!\n", __func__);
           break;
         } else if (n == wr_len) {
           ret = true;
-          fprintf(
-            stdout, "[CyberdogJson][%s]Msg_size: %d, write %d bytes!\n", __func__, msg_size,
+          INFO(
+            "[CyberdogJson][%s]Msg_size: %d, write %d bytes!\n", __func__, msg_size,
             n);
           break;
         }
@@ -411,7 +413,7 @@ public:
       }
       close(fd);
     } else {
-      fprintf(stderr, "[CyberdogJson][%s]Failed! Create file failed!\n", __func__);
+      ERROR("[%s]Failed! Create file failed!\n", __func__);
       ret = false;
     }
     return ret;
@@ -450,7 +452,7 @@ public:
     std::string & value)
   {
     if (!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
+      ERROR("[%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
     if (!doc.HasMember(key) || !doc[key].IsString()) {
@@ -465,7 +467,7 @@ public:
   static bool Get(const json::Document & doc, const char * key, int & value)
   {
     if (!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
+      ERROR("[%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
     if (!doc.HasMember(key) || !doc[key].IsInt()) {
@@ -481,7 +483,7 @@ public:
   static bool Get(const json::Document & doc, const char * key, uint64_t & value)
   {
     if (!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
+      ERROR("[%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
     if (!doc.HasMember(key) || !doc[key].IsUint64()) {
@@ -495,7 +497,7 @@ public:
   static bool Get(json::Document & doc, const char * key, json::Value & value)
   {
     if (!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
+      ERROR("[%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
     if (!doc.HasMember(key)) {
@@ -509,7 +511,7 @@ public:
   static bool Get(const json::Document & doc, const char * key, float & value)
   {
     if (!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
+      ERROR("[%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
     if (!doc.HasMember(key) || !(doc[key].IsFloat() || doc[key].IsInt())) {
@@ -528,7 +530,7 @@ public:
   static bool Get(const json::Document & doc, const char * key, bool & value)
   {
     if (!doc.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s]Failed! Input doc should be kObejectType!\n", __func__);
+      ERROR("[%s]Failed! Input doc should be kObejectType!\n", __func__);
       return false;
     }
     if (!doc.HasMember(key) || !doc[key].IsBool()) {
@@ -552,7 +554,7 @@ public:
   static bool Get(const json::Value & val, const char * key, std::string & value)
   {
     if (!val.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s]Failed! Input val should be kObejectType!\n", __func__);
+      ERROR("[%s]Failed! Input val should be kObejectType!\n", __func__);
       return false;
     }
     if (!val.HasMember(key) || !val[key].IsString()) {
@@ -567,7 +569,7 @@ public:
   static bool Get(const json::Value & val, const char * key, int & value)
   {
     if (!val.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s]Failed! Input val should be kObejectType!\n", __func__);
+      ERROR("[%s]Failed! Input val should be kObejectType!\n", __func__);
       return false;
     }
     if (!val.HasMember(key) || !val[key].IsInt()) {
@@ -581,7 +583,7 @@ public:
   static bool Get(const json::Value & val, const char * key, bool & value)
   {
     if (!val.IsObject()) {
-      fprintf(stderr, "[CyberdogJson][%s]Failed! Input val should be kObejectType!\n", __func__);
+      ERROR("[%s]Failed! Input val should be kObejectType!\n", __func__);
       return false;
     }
     if (!val.HasMember(key) || !val[key].IsBool()) {
