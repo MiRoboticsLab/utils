@@ -159,5 +159,6 @@ TEST(cyberdogjson, file)
 int main(int argc, char ** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
+  LOGGER_MAIN_INSTANCE("JsonTest");
   return RUN_ALL_TESTS();
 }
