@@ -17,6 +17,7 @@
 #include <string>
 #include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_lcm.hpp"
+#include "cyberdog_common/cyberdog_log.hpp"
 #include "lcmtestcs/lcmtestcs.hpp"
 #include "structor/data.hpp"
 // #include "backtrace.h"
@@ -39,17 +40,17 @@ void client_thread_function()
   auto client =
     cyberdog::common::LcmClient<lcmtestcs::lcmtestcs, lcmtestcs::lcmtestcs>(client_name);
   while (true) {
-    fprintf(stdout, "client call once\n");
+    INFO("client call once");
     auto result = client.Request(request, response, 1000);
     if (!result) {
-      fprintf(stderr, "client thread failed once\n");
+      ERROR("client thread failed once");
     } else {
-      // fprintf(stdout, "%s\n", response.cmd.c_str());
-      // fprintf(stdout, "%s\n", response.data.c_str());
-      // fprintf(stdout, "length: %d\n", (int)response.data.length());
+      // INFO("%s", response.cmd.c_str());
+      // INFO("%s", response.data.c_str());
+      // INFO("length: %d", (int)response.data.length());
       xpack::json::decode(response.data, response_data);
-      fprintf(
-        stdout, "client get response cmd: %s\n\tname: %s, result: %d\n",
+      INFO(
+        "client get response cmd: %s\n\tname: %s, result: %d",
         response.cmd.c_str(), response_data.name.c_str(), (int8_t)response_data.result);
     }
     std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -62,9 +63,9 @@ void server_function(const lcmtestcs::lcmtestcs & req, lcmtestcs::lcmtestcs & re
   lcm_request_data request_data;
   lcm_response_data response_data;
   xpack::json::decode(req.data, request_data);
-  // fprintf(stdout, "server~~ %s\n", req.data.c_str());
-  fprintf(
-    stdout, "server receive once\n\tname: %s, id: %d\n",
+  // INFO("server~~ %s", req.data.c_str());
+  INFO(
+    "server receive once\n\tname: %s, id: %d",
     request_data.name.c_str(), request_data.id);
   response_data.name = std::string("server");
   response_data.result = true;
@@ -87,6 +88,7 @@ int main(int argc, char ** argv)
 {
   (void)argc;
   (void)argv;
+  LOGGER_MAIN_INSTANCE("LcmTest");
 
   // signal(SIGSEGV, signal_handler);
   // signal(SIGABRT, signal_handler);
