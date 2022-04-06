@@ -23,11 +23,12 @@
 #include <algorithm>
 #include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_toml.hpp"
+#include "cyberdog_common/cyberdog_log.hpp"
 using cyberdog::common::CyberdogToml;
 
 TEST(hello, hello__Test)
 {
-  std::cout << "hello, gtest!" << std::endl;
+  INFO_STREAM("hello, gtest!");
   EXPECT_EQ('a', 97);
 }
 
@@ -121,8 +122,8 @@ TEST(writer, modify)
 TEST(writer, add)
 {
   toml::value a;
-  std::cout << a.is_uninitialized() << std::endl;
-  std::cout << a.is_table() << std::endl;
+  INFO_STREAM(a.is_uninitialized());
+  INFO_STREAM(a.is_table());
   auto result = CyberdogToml::Set(a, "b", std::string("xiaomi"));
   EXPECT_TRUE(result);
 
@@ -147,7 +148,8 @@ TEST(writer, add)
 
 int main(int argc, char ** argv)
 {
-  // std::cout << BenchmarkPath << std::endl;
+  // INFO_STEAM(BenchmarkPath);
   ::testing::InitGoogleTest(&argc, argv);
+  LOGGER_MAIN_INSTANCE("TomlTest");
   return RUN_ALL_TESTS();
 }

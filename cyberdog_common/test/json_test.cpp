@@ -31,7 +31,7 @@ namespace json = rapidjson;
 
 TEST(hello, hello__Test)
 {
-  std::cout << "hello, gtest!" << std::endl;
+  INFO("%s", "hello, gtest!");
   EXPECT_EQ('A', 65);
 }
 
@@ -47,7 +47,7 @@ TEST(rapidjson, basic_using)
   EXPECT_TRUE(d.IsObject());
   EXPECT_TRUE(d["hello"].IsString());
   EXPECT_TRUE(d.HasMember("version"));
-  std::cout << "version: " << d["version"].GetString() << std::endl;
+  INFO_STREAM("version: " << d["version"].GetString());
 
   json::Value::MemberIterator none = d.FindMember("None");
   EXPECT_EQ(none, d.MemberEnd());
@@ -61,7 +61,7 @@ TEST(rapidjson, basic_using)
 
 TEST(rapidjson, copy)
 {
-  std::cout << "hello copy work" << std::endl;
+  INFO_STREAM("hello copy work");
   const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
   json::Document d;
   d.Parse<0>(json);
@@ -83,7 +83,7 @@ TEST(rapidjson, copy)
 
 TEST(cyberdogjson, reader)
 {
-  std::cout << "hello cyberdogjson reader" << std::endl;
+  INFO_STREAM("hello cyberdogjson reader");
   const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
   json::Document d;
   auto result = CyberdogJson::String2Document(std::string(json), d);
@@ -103,7 +103,7 @@ TEST(cyberdogjson, reader)
 
 TEST(cyberdogjson, writer)
 {
-  std::cout << "hello cyberdogjson writer" << std::endl;
+  INFO_STREAM("hello cyberdogjson writer");
   json::Document d(json::kArrayType);
   json::Value v1(json::kStringType);
   v1.SetString(std::string("hello").c_str(), d.GetAllocator());
@@ -130,7 +130,7 @@ TEST(cyberdogjson, writer)
 
 TEST(cyberdogjson, serialize)
 {
-  std::cout << "hello cyberdogjson serialize" << std::endl;
+  INFO("hello cyberdogjson serialize");
   const char json[] = "{\"hello\":\"Cyberdog\",\"version\":\"Carpo\"}";
   json::Document d;
   if (!CyberdogJson::String2Document(std::string(json), d)) {
