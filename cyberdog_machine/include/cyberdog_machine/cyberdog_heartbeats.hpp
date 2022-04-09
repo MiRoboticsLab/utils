@@ -21,19 +21,106 @@ namespace cyberdog
 {
 namespace machine
 {
-class HeartBeats
+class BeatsCounter final
 {
+  
+};  // class BeatsDectector
+
+
+class HeartBeatsBase
+{
+    using BeatsMap = std::map<std::string, int32_t>;
+
 public:
-  HeartBeats(const std::string & name);
-  ~HeartBeats();
-  void ConfigHeartBeats();
-  void Start();
-  void Stop();
-  void Update();
-  void CheckoutError();
+    explicit HeartBeatsBase(const std::string & name)
+        : name_(name)
+    {}
+    ~HeartBeatsBase(){}
+
+    void HeartConfig(bool publisher, bool listener, int32_t gap) {
+        is_publisher_ = publisher;
+        is_listener_ = listener;
+        beats_gap_ = gap;
+    }
+
+    bool HeartInit(const BeatsMap & beats_map) {
+        if(beats_map.empty())
+            return false;
+        beats_map_ = beats_map;
+        return true;
+    }
+
+    void HeartActivate() {
+        SetBeatStatus(true);
+    } 
+
+    bool HeartCheck() {
+      return true;
+    }
+
+    void HeartSuspend() {
+
+        SetBeatStatus(false);
+    }
+
+    virtual void BeatsPublish() = 0;
+
 private:
-  rclcpp::TimerBase::SharedPtr timer_;
+    void SetBeatStatus(bool state) {
+        std::unique_lock<std::mutex> lk(beats_mutex_);
+        if(! is_active_) {
+            is_active_ = state;
+            beats_cv_.notify_one();
+        } else {
+            is_active_ = state;
+        }
+    }
+
+    bool GetBeatsStatus() {
+        return is_active_;
+    }
+
+    void CheckBeatsStatus() {
+        if(! GetBeatsStatus()) {
+            std::unique_lock<std::mutex> lk(beats_mutex_);
+            beats_cv_.wait(lk);
+        }
+    }
+
+    void BeatsRunner() {
+        while (true)
+        {
+            CheckBeatsStatus();
+            // BeatsPublish();
+            std::this_thread::sleep_for(std::chrono::milliseconds(beats_gap_));
+        }
+    }
+
+private:
+    std::string name_;
+    bool    is_listener_ {false};
+    bool    is_publisher_ {false};
+    int32_t beats_gap_ {1000};  // timer with millisecond
+    std::atomic_bool    is_active_ {false};
+    std::thread beats_thread_;
+    std::mutex beats_mutex_;
+    std::condition_variable beats_cv_;
+    BeatsMap beats_map_;
 };  // class HeartBeats
+
+// class HeartListener : public HeartBeatsBase
+// {
+// public:
+//     HeartListener(const std::string & name) {}
+//     ~HeartListener() {}
+// };  // class HeartListener
+
+// class HeartTalker : public HeartBeatsBase
+// {};  // class HeartTalker
+
+// class HeartBonder
+// {};  // class HeartBonder
+
 }  // namespace machine
 }  // namespace cyberdog
 
