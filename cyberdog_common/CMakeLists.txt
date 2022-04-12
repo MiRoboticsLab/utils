@@ -28,6 +28,7 @@ set(dependencies
 add_library(cyberdog_log SHARED
   include/cyberdog_common/cyberdog_log.hpp
   src/cyberdog_log.cpp)
+
 target_include_directories(cyberdog_log PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<INSTALL_INTERFACE:include>)
@@ -36,6 +37,7 @@ target_compile_definitions(cyberdog_log
 ament_target_dependencies(
   cyberdog_log
   ${dependencies})
+
 
 if(NOT WIN32)
   ament_environment_hooks(
