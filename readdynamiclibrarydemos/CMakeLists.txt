@@ -36,14 +36,14 @@ find_package(ament_cmake REQUIRED)
 # add_executable(demo_binary main.cpp configuration.cpp)
 # target_link_libraries(demo_binary ${PythonLibs} ${PYTHON_LIBRARIES})
 
-install(DIRECTORY
-  scripts
-  DESTINATION share/${PROJECT_NAME}/
-)
+# install(DIRECTORY
+#   scripts
+#   DESTINATION share/${PROJECT_NAME}/
+# )
 
-ament_package(CONFIG_EXTRAS
-    cmake/FindCython.cmake
-    cmake/functions.cmake
-)
+# ament_package(CONFIG_EXTRAS
+#     cmake/FindCython.cmake
+#     cmake/functions.cmake
+# )
 
 
