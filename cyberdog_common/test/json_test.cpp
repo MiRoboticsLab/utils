@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
  * @file json_test.cpp
  * @author dukun (dukun1@xiaomi.com)
@@ -21,141 +22,151 @@
  * @date 2022-01-26
  *
  */
+
 #include <iostream>
 #include <algorithm>
+#include <string>
+
 #include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_json.hpp"
-using namespace cyberdog::common;
 
-TEST(hello, hello__Test)
-{
-  std::cout << "hello, gtest!" << std::endl;
-  EXPECT_EQ('A', 65);
-}
+// namespace cyberdog
+// {
+// namespace common
+// {
 
-TEST(rapidjson, basic_using)
-{
-  const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
-  json::Document d;
-  d.Parse<0>(json);
-  if (d.HasParseError()) {
-    return;
-  }
+// TEST(hello, hello__Test)
+// {
+//   std::cout << "hello, gtest!" << std::endl;
+//   EXPECT_EQ('A', 65);
+// }
 
-  EXPECT_TRUE(d.IsObject());
-  EXPECT_TRUE(d["hello"].IsString());
-  EXPECT_TRUE(d.HasMember("version"));
-  std::cout << "version: " << d["version"].GetString() << std::endl;
+// TEST(rapidjson, basic_using)
+// {
+//   const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
+//   json::Document d;
+//   d.Parse<0>(json);
+//   if (d.HasParseError()) {
+//     return;
+//   }
 
-  json::Value::MemberIterator none = d.FindMember("None");
-  EXPECT_EQ(none, d.MemberEnd());
-  (void)none;
-  json::Value::MemberIterator hello = d.FindMember("hello");
-  EXPECT_NE(hello, d.MemberEnd());
-  EXPECT_TRUE(hello->value.IsString());
-  EXPECT_EQ(strcmp("Cyberdog", hello->value.GetString()), 0);
-  (void)hello;
-}
+//   EXPECT_TRUE(d.IsObject());
+//   EXPECT_TRUE(d["hello"].IsString());
+//   EXPECT_TRUE(d.HasMember("version"));
+//   std::cout << "version: " << d["version"].GetString() << std::endl;
 
-TEST(rapidjson, copy)
-{
-  std::cout << "hello copy work" << std::endl;
-  const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
-  json::Document d;
-  d.Parse<0>(json);
-  if (d.HasParseError()) {
-    return;
-  }
+//   json::Value::MemberIterator none = d.FindMember("None");
+//   EXPECT_EQ(none, d.MemberEnd());
+//   (void)none;
+//   json::Value::MemberIterator hello = d.FindMember("hello");
+//   EXPECT_NE(hello, d.MemberEnd());
+//   EXPECT_TRUE(hello->value.IsString());
+//   EXPECT_EQ(strcmp("Cyberdog", hello->value.GetString()), 0);
+//   (void)hello;
+// }
 
-  EXPECT_TRUE(d.IsObject());
+// TEST(rapidjson, copy)
+// {
+//   std::cout << "hello copy work" << std::endl;
+//   const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
+//   json::Document d;
+//   d.Parse<0>(json);
+//   if (d.HasParseError()) {
+//     return;
+//   }
 
-  json::Document other;
-  other.CopyFrom(d, other.GetAllocator());
-  EXPECT_TRUE(other.IsObject());
-  EXPECT_FALSE(d.IsNull());
+//   EXPECT_TRUE(d.IsObject());
 
-  json::Document another;
-  another.Swap(d);
-  EXPECT_TRUE(d.IsNull());
-}
+//   json::Document other;
+//   other.CopyFrom(d, other.GetAllocator());
+//   EXPECT_TRUE(other.IsObject());
+//   EXPECT_FALSE(d.IsNull());
 
-TEST(cyberdogjson, reader)
-{
-  std::cout << "hello cyberdogjson reader" << std::endl;
-  const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
-  json::Document d;
-  auto result = CyberdogJson::String2Document(std::string(json), d);
-  EXPECT_TRUE(result);
+//   json::Document another;
+//   another.Swap(d);
+//   EXPECT_TRUE(d.IsNull());
+// }
 
-  std::string hello;
-  result = CyberdogJson::Get(d, "hello", hello);
-  EXPECT_TRUE(result);
-  EXPECT_EQ(strcmp(hello.c_str(), "Cyberdog"), 0);
-  EXPECT_FALSE(CyberdogJson::Get(d, "world", hello));
-  json::Document dd(json::kArrayType);
+// TEST(cyberdogjson, reader)
+// {
+//   std::cout << "hello cyberdogjson reader" << std::endl;
+//   const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
+//   json::Document d;
+//   auto result = CyberdogJson::String2Document(std::string(json), d);
+//   EXPECT_TRUE(result);
 
-  int no;
-  result = CyberdogJson::Get(dd, "no", no);
-  EXPECT_FALSE(result);
-}
+//   std::string hello;
+//   result = CyberdogJson::Get(d, "hello", hello);
+//   EXPECT_TRUE(result);
+//   EXPECT_EQ(strcmp(hello.c_str(), "Cyberdog"), 0);
+//   EXPECT_FALSE(CyberdogJson::Get(d, "world", hello));
+//   json::Document dd(json::kArrayType);
 
-TEST(cyberdogjson, writer)
-{
-  std::cout << "hello cyberdogjson writer" << std::endl;
-  json::Document d(json::kArrayType);
-  json::Value v1(json::kStringType);
-  v1.SetString(std::string("hello").c_str(), d.GetAllocator());
-  auto result = CyberdogJson::Add(d, v1);
-  EXPECT_TRUE(result);
-  EXPECT_TRUE(d.IsArray());
+//   int no;
+//   result = CyberdogJson::Get(dd, "no", no);
+//   EXPECT_FALSE(result);
+// }
 
-  const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
-  result = CyberdogJson::String2Document(std::string(json), d);
-  EXPECT_TRUE(result);
-  EXPECT_TRUE(d.IsObject());
+// TEST(cyberdogjson, writer)
+// {
+//   std::cout << "hello cyberdogjson writer" << std::endl;
+//   json::Document d(json::kArrayType);
+//   json::Value v1(json::kStringType);
+//   v1.SetString(std::string("hello").c_str(), d.GetAllocator());
+//   auto result = CyberdogJson::Add(d, v1);
+//   EXPECT_TRUE(result);
+//   EXPECT_TRUE(d.IsArray());
 
-  result = CyberdogJson::Add(d, "project", "L91");
-  EXPECT_TRUE(result);
-  EXPECT_TRUE(d.HasMember("project"));
+//   const char json[] = "{\"hello\": \"Cyberdog\", \"version\": \"Carpo\"}";
+//   result = CyberdogJson::String2Document(std::string(json), d);
+//   EXPECT_TRUE(result);
+//   EXPECT_TRUE(d.IsObject());
 
-  json::Value v2(json::kObjectType);
-  v2.AddMember("a", json::Value().SetInt(1), d.GetAllocator());
-  v2.AddMember("b", json::Value().SetInt(2), d.GetAllocator());
-  CyberdogJson::Add(d, "array", v2);
-  EXPECT_TRUE(d.HasMember("array"));
-  EXPECT_TRUE(d["array"].IsObject());
-}
+//   result = CyberdogJson::Add(d, "project", "L91");
+//   EXPECT_TRUE(result);
+//   EXPECT_TRUE(d.HasMember("project"));
 
-TEST(cyberdogjson, serialize)
-{
-  std::cout << "hello cyberdogjson serialize" << std::endl;
-  const char json[] = "{\"hello\":\"Cyberdog\",\"version\":\"Carpo\"}";
-  json::Document d;
-  if (!CyberdogJson::String2Document(std::string(json), d)) {
-    return;
-  }
-  std::string after;
-  if (!CyberdogJson::Document2String(d, after)) {
-    return;
-  }
-  EXPECT_EQ(std::string(json), after);
-}
+//   json::Value v2(json::kObjectType);
+//   v2.AddMember("a", json::Value().SetInt(1), d.GetAllocator());
+//   v2.AddMember("b", json::Value().SetInt(2), d.GetAllocator());
+//   CyberdogJson::Add(d, "array", v2);
+//   EXPECT_TRUE(d.HasMember("array"));
+//   EXPECT_TRUE(d["array"].IsObject());
+// }
 
-TEST(cyberdogjson, file)
-{
-  std::string file_name = std::string(BenchmarkPath) + std::string("/benchmark.json");
-  json::Document d;
-  auto result = CyberdogJson::ReadJsonFromFile(file_name, d);
-  EXPECT_TRUE(result);
-  EXPECT_TRUE(d.IsObject());
+// TEST(cyberdogjson, serialize)
+// {
+//   std::cout << "hello cyberdogjson serialize" << std::endl;
+//   const char json[] = "{\"hello\":\"Cyberdog\",\"version\":\"Carpo\"}";
+//   json::Document d;
+//   if (!CyberdogJson::String2Document(std::string(json), d)) {
+//     return;
+//   }
+//   std::string after;
+//   if (!CyberdogJson::Document2String(d, after)) {
+//     return;
+//   }
+//   EXPECT_EQ(std::string(json), after);
+// }
 
-  std::string error_file("error_file");
-  result = CyberdogJson::ReadJsonFromFile(error_file, d);
-  EXPECT_FALSE(result);
-}
+// TEST(cyberdogjson, file)
+// {
+//   std::string file_name = std::string(BenchmarkPath) + std::string("/benchmark.json");
+//   json::Document d;
+//   auto result = CyberdogJson::ReadJsonFromFile(file_name, d);
+//   EXPECT_TRUE(result);
+//   EXPECT_TRUE(d.IsObject());
 
-int main(int argc, char ** argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+//   std::string error_file("error_file");
+//   result = CyberdogJson::ReadJsonFromFile(error_file, d);
+//   EXPECT_FALSE(result);
+// }
+
+// }  //  namespace common
+// }  //  namespace cyberdog
+
+// int main(int argc, char ** argv)
+// {
+//   ::testing::InitGoogleTest(&argc, argv);
+//   return RUN_ALL_TESTS();
+// }

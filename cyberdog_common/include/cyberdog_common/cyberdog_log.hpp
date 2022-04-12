@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CYBERDOG_COMMON__CYBERDOG_LOG_LOGGER_HPP_
-#define CYBERDOG_COMMON__CYBERDOG_LOG_LOGGER_HPP_
+#ifndef CYBERDOG_COMMON__CYBERDOG_LOG_HPP_
+#define CYBERDOG_COMMON__CYBERDOG_LOG_HPP_
+
+#include <memory>
+#include <string>
 
 #include "rclcpp/logger.hpp"
 #include "rclcpp/logging.hpp"
@@ -27,14 +30,16 @@ namespace common
 class CyberdogLogger
 {
 public:
-  CyberdogLogger(const char* name):logger_name(name) {
-      logger = logger_name.empty() ?  
-      std::make_shared<rclcpp::Logger>(rclcpp::get_logger(UNINITIALIZED_NAME)) 
-      : 
+  explicit CyberdogLogger(const char * name)
+  : logger_name(name)
+  {
+    logger = logger_name.empty() ?
+      std::make_shared<rclcpp::Logger>(rclcpp::get_logger(UNINITIALIZED_NAME))
+      :
       std::make_shared<rclcpp::Logger>(rclcpp::get_logger(logger_name));
   }
-  CyberdogLogger(const CyberdogLogger &) =delete;
-  CyberdogLogger &operator=(const CyberdogLogger &)=delete; 
+  CyberdogLogger(const CyberdogLogger &) = delete;
+  CyberdogLogger & operator=(const CyberdogLogger &) = delete;
 
   ~CyberdogLogger() {}
 
@@ -45,25 +50,26 @@ public:
 
   std::shared_ptr<rclcpp::Logger> Get_Logger()
   {
-      return logger;
+    return logger;
   }
 
 private:
   std::string logger_name;
   std::shared_ptr<rclcpp::Logger> logger;
-}; // class CyberdogLogger
+};  //  class CyberdogLogger
 
 class CyberdogLoggerFactory final
 {
 public:
-    static std::shared_ptr<rclcpp::Logger> Get_Logger();
-    static std::shared_ptr<rclcpp::Logger> Get_Logger(const char* sz_name);
-private:
-    static std::shared_ptr<rclcpp::Logger> main_logger;
-}; // class CyberdogLoggerFactory
+  static std::shared_ptr<rclcpp::Logger> Get_Logger();
+  static std::shared_ptr<rclcpp::Logger> Get_Logger(const char * sz_name);
 
-} // namespace common
-} // namespace cyberdog
+private:
+  static std::shared_ptr<rclcpp::Logger> main_logger;
+};  //  class CyberdogLoggerFactory
+
+}  //  namespace common
+}  //  namespace cyberdog
 
 inline rclcpp::Logger get_logger()
 {
@@ -71,7 +77,9 @@ inline rclcpp::Logger get_logger()
 }
 
 #define LOGGER_MAIN_INSTANCE(instance_name) \
-        std::shared_ptr<rclcpp::Logger> out_logger = cyberdog::common::CyberdogLoggerFactory::Get_Logger(instance_name);
+  std::shared_ptr<rclcpp::Logger> out_logger = \
+    cyberdog::common::CyberdogLoggerFactory::Get_Logger( \
+    instance_name);
 
 #define DEBUG(...) RCLCPP_DEBUG(get_logger(), __VA_ARGS__)
 #define INFO(...) RCLCPP_INFO(get_logger(), __VA_ARGS__)
@@ -91,11 +99,16 @@ inline rclcpp::Logger get_logger()
 #define ERROR_FUNCTION(function, ...) RCLCPP_ERROR_FUNCTION(get_logger(), function, __VA_ARGS__)
 #define FATAL_FUNCTION(function, ...) RCLCPP_FATAL_FUNCTION(get_logger(), function, __VA_ARGS__)
 
-#define DEBUG_EXPRESSION(expression, ...) RCLCPP_DEBUG_EXPRESSION(get_logger(), expression, __VA_ARGS__)
-#define INFO_EXPRESSION(expression, ...) RCLCPP_INFO_EXPRESSION(get_logger(), expression, __VA_ARGS__)
-#define WARN_EXPRESSION(expression, ...) RCLCPP_WARN_EXPRESSION(get_logger(), expression, __VA_ARGS__)
-#define ERROR_EXPRESSION(expression, ...) RCLCPP_ERROR_EXPRESSION(get_logger(), expression, __VA_ARGS__)
-#define FATAL_EXPRESSION(expression, ...) RCLCPP_FATAL_EXPRESSION(get_logger(), expression, __VA_ARGS__)
+#define DEBUG_EXPRESSION(expression, ...) RCLCPP_DEBUG_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define INFO_EXPRESSION(expression, ...) RCLCPP_INFO_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define WARN_EXPRESSION(expression, ...) RCLCPP_WARN_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define ERROR_EXPRESSION(expression, ...) RCLCPP_ERROR_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
+#define FATAL_EXPRESSION(expression, ...) RCLCPP_FATAL_EXPRESSION( \
+    get_logger(), expression, __VA_ARGS__)
 
 /*
 #define LOGGER_INSTANCE(instance_name) \
@@ -103,4 +116,4 @@ inline rclcpp::Logger get_logger()
         std::shared_ptr<rclcpp::Logger> out_logger = cyberdog_logger.Get_Logger();
 */
 
-#endif
+#endif  // CYBERDOG_COMMON__CYBERDOG_LOG_HPP_

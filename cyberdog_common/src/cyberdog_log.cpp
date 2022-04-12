@@ -1,4 +1,21 @@
+// Copyright (c) 2021 Beijing Xiaomi Mobile Software Co., Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "cyberdog_common/cyberdog_log.hpp"
+
+#include <memory>
+
 // #include "rclcpp/rclcpp.hpp"
 // #include "cyberdog_common/srv/config_logger.hpp"
 
@@ -53,7 +70,7 @@
 //             rcutils_reset_error();
 //             response->success = false;
 //         }
-//         response->success = true;        
+//         response->success = true;
 //     }
 
 // private:
@@ -62,24 +79,31 @@
 // } // namespace common
 // } // namespace cyberdog
 
-using namespace cyberdog::common;
+namespace cyberdog
+{
+namespace common
+{
 
 std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::main_logger = nullptr;
 
 std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger()
 {
-    return main_logger == nullptr ? std::make_shared<rclcpp::Logger>(rclcpp::get_logger(UNINITIALIZED_NAME)):main_logger;
+  return main_logger ==
+         nullptr ? std::make_shared<rclcpp::Logger>(rclcpp::get_logger(UNINITIALIZED_NAME)) :
+         main_logger;
 }
 
-std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger(const char* sz_name)
+std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger(const char * sz_name)
 {
-    if(!main_logger)
-    {
-        CyberdogLogger cyberdog_logger(sz_name);
-        main_logger = cyberdog_logger.Get_Logger();
-        // std::string config_name = std::string(sz_name)+"_severity";
-        // static auto logger_config = std::make_shared<LoggerConfig>(config_name);
-        // rclcpp::spin(logger_config);
-    }
-    return main_logger;
+  if (!main_logger) {
+    CyberdogLogger cyberdog_logger(sz_name);
+    main_logger = cyberdog_logger.Get_Logger();
+    // std::string config_name = std::string(sz_name)+"_severity";
+    // static auto logger_config = std::make_shared<LoggerConfig>(config_name);
+    // rclcpp::spin(logger_config);
+  }
+  return main_logger;
 }
+
+}  //  namespace common
+}  //  namespace cyberdog

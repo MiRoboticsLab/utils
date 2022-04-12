@@ -11,23 +11,32 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "gtest/gtest.h"
 #include "cyberdog_common/cyberdog_log.hpp"
 
-TEST(cyberdoglog, test1)
-{
-    INFO("cyberdog log test1");
-}
-
-TEST(cyberdoglog, test2)
-{
-    LOGGER_MAIN_INSTANCE("test2");
-    INFO("cyberdog log test2");
-}
+#include "gtest/gtest.h"
 
 
-int main(int argc, char ** argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+// namespace cyberdog
+// {
+// namespace common
+// {
+
+// TEST(cyberdoglog, test1)
+// {
+//   INFO("cyberdog log test1");
+// }
+
+// TEST(cyberdoglog, test2)
+// {
+//   LOGGER_MAIN_INSTANCE("test2");
+//   INFO("cyberdog log test2");
+// }
+
+// }  //  namespace common
+// }  //  namespace cyberdog
+
+// int main(int argc, char ** argv)
+// {
+//   ::testing::InitGoogleTest(&argc, argv);
+//   return RUN_ALL_TESTS();
+// }
