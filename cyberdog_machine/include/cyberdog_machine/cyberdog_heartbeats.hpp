@@ -11,14 +11,31 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-<<<<<<< HEAD
+#ifndef CYBERDOG_MACHINE__CYBERDOG_HEARTBEATS_HPP_
+#define CYBERDOG_MACHINE__CYBERDOG_HEARTBEATS_HPP_
+#include <string>
+#include "rclcpp/node.hpp"
+#include "cyberdog_common/cyberdog_json.hpp"
 
 namespace cyberdog
 {
-namespace common
+namespace machine
 {
+class HeartBeats
+{
+public:
+  HeartBeats(const std::string & name);
+  ~HeartBeats();
+  void ConfigHeartBeats();
+  void Start();
+  void Stop();
+  void Update();
+  void CheckoutError();
+private:
+  rclcpp::TimerBase::SharedPtr timer_;
+};  // class HeartBeats
+}  // namespace machine
+}  // namespace cyberdog
 
-}  //  namespace common
-}  //  namespace cyberdog
-=======
->>>>>>> dev
+#endif  // CYBERDOG_MACHINE__CYBERDOG_HEARTBEATS_HPP_
+

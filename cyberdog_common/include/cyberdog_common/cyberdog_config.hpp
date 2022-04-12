@@ -13,17 +13,14 @@
 // limitations under the License.
 #ifndef CYBERDOG_COMMON__CYBERDOG_CONFIG_HPP_
 #define CYBERDOG_COMMON__CYBERDOG_CONFIG_HPP_
-
-#include <vector>
 #include <string>
-
+#include <vector>
 #include "cyberdog_common/cyberdog_toml.hpp"
 
 namespace cyberdog
 {
 namespace common
 {
-
 class CyberdogConfig final
 {
 public:
@@ -47,28 +44,24 @@ public:
   template<typename V>
   bool Get(const std::string & key, V & value)
   {
-    // TODO(my_username): Stuff get value with v
     return true;
   }
 
   template<typename T>
   bool Get(const std::string & key, std::vector<T> & value)
   {
-    // TODO(my_username): Stuff get value with v
     return true;
   }
 
   template<typename V>
   bool Get(const std::string & key_first, const std::string & key_second, V & value)
   {
-    // TODO(my_username): Stuff get value with v
     return true;
   }
 
   template<typename V>
   bool Get(const std::string & key_first, const int & key_second, V & value)
   {
-    // TODO(my_username): Stuff get value with v
     return true;
   }
 
@@ -87,7 +80,6 @@ public:
   template<typename K, typename V>
   bool Set(const K & k, const V & v)
   {
-    // TODO(my_username): Stuff set value with k
     return true;
   }
 
