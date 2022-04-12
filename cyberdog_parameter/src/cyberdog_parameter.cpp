@@ -217,6 +217,7 @@ std::vector<std::string> ParameterParser::GetArrayValuesAsStrings(const std::str
   for (int i = 0; i < values.size(); i++) {
     result.push_back(toml::find<std::string>(values, i));
   }
+  
   return result;
 }
 
