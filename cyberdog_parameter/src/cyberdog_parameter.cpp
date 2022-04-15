@@ -64,6 +64,34 @@ ParameterParser::ParameterParser(const std::string & configuration_filename)
   INFO("[TomlParameterConfig] : Load configuration parameters success.");
 }
 
+ParameterParser::ParameterParser(const std::string& directory, const std::string & configuration_filename)
+{
+  std::string suffix = configuration_filename.substr(configuration_filename.find_last_of('.') + 1);
+  if (suffix == "so") {
+    std::string filename = configuration_filename.substr(0, configuration_filename.rfind("."));
+    bool success = LoadDefaultParameters(directory, filename);
+    if (!success) {
+      ERROR("[TomlParameterConfig] : Load dynamic library format configuration file : %s error.", filename.c_str());
+      return;
+    }
+  }
+  else {
+    auto filename = directory + configuration_filename;
+    toml_config_filename_ = filename;
+    
+    // if (!std::filesystem::exists(filename)) {
+    //   ERROR("[ParameterParser] : %s is not exist.", filename.c_str());
+    //   return;
+    // }
+
+    bool success = common::CyberdogToml::ParseFile(filename, file_solver_handler_);
+    if (!success) {
+      ERROR("[TomlParameterConfig] : Load toml format configuration filename : %s error.", filename.c_str());
+      return;
+    }
+  } 
+}
+
 ParameterParser::~ParameterParser()
 {
   Py_Finalize();
@@ -74,8 +102,15 @@ bool ParameterParser::LoadDefaultParameters(const std::string & toml_dynamic_lib
   return ReadParmtersFromSharedLibrary(toml_dynamic_library_name);
 }
 
+bool ParameterParser::LoadDefaultParameters(
+  const std::string& directory, const std::string& filename)
+{
+  return ReadParmtersFromSharedLibrary(directory, filename);
+}
+
 bool ParameterParser::ParameterParser::HasKey(const std::string& key)
 {
+  (void)key;
   return true;
 }
 
@@ -157,27 +192,12 @@ bool ParameterParser::SetDouble(const std::string& key, const double & value)
 
 bool ParameterParser::SetInt(const std::string& key, const int & value)
 {
-  // auto keys = Tokenize(key, ".");
-  // auto data_parser = ParseTomlReference(keys, file_solver_handler_, 0);
-
-  // std::cout << "value = " << value << std::endl;
-  // std::get<0>(data_parser)[std::get<1>(data_parser)] = value;
-
-  // std::cout << "path : " << toml_config_filename() << std::endl;
-
-  // // bool success = common::CyberdogToml::Set(std::get<0>(data_parser), std::get<1>(data_parser), value);
-  // // if (!success) {
-  // //   ERROR("[TomlParameterConfig] : SetInt function key =  %s error.", key.c_str());
-  // //   return success;
-  // // }
-
-  // std::cout << "file\n" << file_solver_handler_ << std::endl;
-  // bool success = common::CyberdogToml::WriteFile(toml_config_filename(), file_solver_handler_);
-  // if (!success) {
-  //   ERROR("[TomlParameterConfig] : WriteFile() function key =  %s error.", key.c_str());
-  //   return success;
-  // }
-  return false;
+  bool success = common::CyberdogToml::Set(file_solver_handler_, key, value);
+  if (!success) {
+    ERROR("[ParameterParser] : SetInt function key =  %s error.", key.c_str());
+    return success;
+  }
+  return success;
 }
 
 bool ParameterParser::SetBool(const std::string& key, const bool & value)
@@ -194,7 +214,7 @@ std::vector<double> ParameterParser::GetArrayValuesAsDoubles(const std::string& 
 {
   const auto values = toml::find(file_solver_handler_, key);
   std::vector<double> result;
-  for (int i = 0; i < values.size(); i++) {
+  for (int i = 0; i < static_cast<int>(values.size()); i++) {
     result.push_back(toml::find<double>(values, i));
   }
   return result;
@@ -204,7 +224,7 @@ std::vector<int> ParameterParser::GetArrayValuesAsIntegers(const std::string& ke
 {
   const auto values = toml::find(file_solver_handler_, key);
   std::vector<int> result;
-  for (int i = 0; i < values.size(); i++) {
+  for (int i = 0; i < static_cast<int>(values.size()); i++) {
     result.push_back(toml::find<int>(values, i));
   }
   return result;
@@ -214,7 +234,7 @@ std::vector<std::string> ParameterParser::GetArrayValuesAsStrings(const std::str
 {
   const auto values = toml::find(file_solver_handler_, key);
   std::vector<std::string> result;
-  for (int i = 0; i < values.size(); i++) {
+  for (int i = 0; i < static_cast<int>(values.size()); i++) {
     result.push_back(toml::find<std::string>(values, i));
   }
   
@@ -332,6 +352,60 @@ bool ParameterParser::ReadParmtersFromSharedLibrary(const std::string & shared_n
   return true;
 }
 
+bool ParameterParser::ReadParmtersFromSharedLibrary(const std::string& directory, const std::string & filename)
+{
+  std::string import = "import " + filename + "\n";
+  Py_Initialize();
+  if (!Py_IsInitialized()) {
+    return false;
+  }
+
+  std::string config_path =  directory;
+
+  std::string py_cmd = "sys.path.append('" + config_path + "')";
+  PyRun_SimpleString("import sys; import toml;");
+  PyRun_SimpleString(py_cmd.c_str());
+  PyRun_SimpleString(import.c_str());
+
+  PyObject* pName  = PyUnicode_FromString(filename.c_str());
+  PyObject* pModule = PyImport_Import(pName);
+  if( pModule == nullptr){
+    std::cout <<"module not found" << std::endl;
+    return false;
+  }
+
+  // get function
+  std::string python_function = "get_" + filename + "_data";
+  PyObject* pFunc = PyObject_GetAttrString(pModule, python_function.c_str());
+  if( !pFunc || !PyCallable_Check(pFunc)) {
+    std::cout << "Not found function : " << python_function << std::endl;
+    return false;
+  }
+
+  // call function
+  PyObject* function_ret = PyObject_CallObject(pFunc, NULL);
+  if (!function_ret) {
+      std::cout << "Call function error.!" << std::endl;
+  }
+
+  // istream parse toml
+  char* result;
+  PyArg_Parse(function_ret, "s", &result);//转换返回类型
+  std::string toml_data = std::string(result);
+  std::istringstream iss(toml_data);
+  file_solver_handler_ = toml::parse(iss );
+
+  // auto name = toml::find<std::string>(file_solver_handler_, "A", "f");
+  // std::cout << "name = " << name << std::endl;
+
+  Py_DECREF(pName);
+  Py_DECREF(pModule);
+  Py_DECREF(pFunc);
+  Py_DECREF(function_ret);
+  Py_Finalize();
+  return true;
+}
+
 std::vector<std::string> ParameterParser::Tokenize(
   const std::string & str,
   const std::string & delimiters)
@@ -367,7 +441,7 @@ std::tuple<toml::value, std::string> ParameterParser::ParseToml(
   int index)
 {
   std::tuple<toml::value, std::string> data;  
-  if (index < keys.size() - 1) {
+  if (index < static_cast<int>(keys.size() - 1)) {
     std::get<0>(data) = toml::find(toml_parser, keys[index]);;
     std::get<1>(data) = keys[index];
     return ParseToml(std::get<0>(data), keys, index + 1); 

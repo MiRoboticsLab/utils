@@ -33,6 +33,7 @@ public:
 
   // Toml format or dynamic library format configuration
   ParameterParser(const std::string & configuration_filename);
+  ParameterParser(const std::string& directory, const std::string & configuration_filename);
   ~ParameterParser();
 
   ParameterParser(const ParameterParser &) = delete;
@@ -40,6 +41,7 @@ public:
 
   // Load toml configuration from dynamic library
   bool LoadDefaultParameters(const std::string & toml_dynamic_library_name);
+  bool LoadDefaultParameters(const std::string& directory, const std::string& filename);
 
   // Returns true if the key is in this config filename.
   bool HasKey(const std::string& key);
@@ -77,6 +79,9 @@ public:
 private:
   // Reads dynamic library so default configuration file
   bool ReadParmtersFromSharedLibrary(const std::string & shared_name);
+
+  // Reads dynamic library so default configuration file
+  bool ReadParmtersFromSharedLibrary(const std::string& directory, const std::string & filename);
 
   // String split
   std::vector<std::string> Tokenize(const std::string & str, const std::string & delimiters);

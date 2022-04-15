@@ -3,6 +3,8 @@
 //
 
 #include "cyberdog_parameter/cyberdog_parameter.hpp"
+#include "ament_index_cpp/get_package_prefix.hpp"
+#include "cyberdog_common/cyberdog_toml.hpp"
 
 #include <string>
 #include <vector>
@@ -11,6 +13,8 @@ namespace cyberdog
 {
 namespace parameter
 {
+
+/*
 void TestCase1()
 {
   std::string so_filename = "test_toml.so";
@@ -124,15 +128,82 @@ void TestCase4()
               << "C_1_d = " << C_1_d << std::endl;
 
 }
+*/
+
+
+void TestCase5()
+{
+  std::string path = ament_index_cpp::get_package_prefix("test_readdynamiclibrary") + 
+    "/lib/test_readdynamiclibrary/";
+  std::string filename = "test_toml.so";
+  ParameterParser parser(path, filename);
+
+  // toml format
+  // a = 10
+  // b = "cyberdog"
+  // c = true
+  // d = 0.1
+  // aa = ["foo", "bar", "baz"]
+  // bb = [1.1, 0.5, 880.123]
+  // cc = [1, 5, 8]
+  int a = parser.GetInt("a");
+  std::string b = parser.GetString("b");
+  bool c = parser.GetBool("c");
+  double d = parser.GetDouble("d");
+  std::vector<std::string> aa = parser.GetArrayValuesAsStrings("aa");
+  std::cout << "a = " << a << std::endl
+            << "b = " << b << std::endl
+            << "c = " << c << std::endl
+            << "d = " << d << std::endl;
+  for (auto str : aa) {
+    std::cout << str << " ";
+  }
+
+  std::cout << std::endl;
+}
+
+void TestCase6()
+{
+  // toml format
+  // [A.c]
+  // e = 22222
+  // f = "cyberdog_c"
+  // g = false
+  // h = 0.2222
+
+  std::string path = ament_index_cpp::get_package_prefix("test_readdynamiclibrary") + 
+    "/lib/test_readdynamiclibrary/";
+  std::string filename = "test_toml.so";
+  ParameterParser parser(path, filename);
+
+  auto toml_parser = parser.GetParameterHandler();
+
+  int e = toml::find<int>(toml_parser, "A", "c", "e");
+  std::string f = toml::find<std::string>(toml_parser, "A","c",  "f");
+  bool g = toml::find<bool>(toml_parser, "A", "c", "g");
+  double h = toml::find<double>(toml_parser, "A", "c", "h");
+
+  std::cout << "e = " << e << std::endl
+            << "f = " << f << std::endl
+            << "g = " << g << std::endl
+            << "h = " << h << std::endl;
+
+}
 
 } // namespace parameter
 } // namespace cyberdog
 
 int main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
     // cyberdog::parameter::TestCase1();
     // cyberdog::parameter::TestCase2();
     // cyberdog::parameter::TestCase3();
-    cyberdog::parameter::TestCase4();
+    // cyberdog::parameter::TestCase4();
+    // cyberdog::parameter::TestCase5();
+    cyberdog::parameter::TestCase6();
+
     return 0;
 }
