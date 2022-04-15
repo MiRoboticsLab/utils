@@ -158,6 +158,22 @@ TEST(cyberdogjson, file)
   EXPECT_FALSE(result);
 }
 
+TEST(cyberdogjson, cyberdog_grpc)
+{
+  INFO("test cyberdogjson for cyberdog_grpc");
+  json::Document d;
+  std::string file_name = std::string(BenchmarkPath) + std::string("/benchmark.json");
+  INFO("filename: %s", file_name.c_str());
+  auto result = CyberdogJson::ReadJsonFromFile(file_name, d);
+  EXPECT_TRUE(result);
+  json::Value v(json::kArrayType);
+  result = CyberdogJson::Get(d, "grpc", v);
+  EXPECT_TRUE(result);
+  float v0;
+  v0 = v.GetArray()[0].GetFloat();
+  INFO("v0 value is: %d", v0);
+}
+
 int main(int argc, char ** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
