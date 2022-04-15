@@ -22,8 +22,9 @@ set(dependencies
   PythonInterp
   PythonLibs
   cyberdog_parameter
-  # cyberdog_common
+  cyberdog_common
   toml
+  ament_index_cpp
 )
 
 include_directories(include ${PYTHON_INCLUDE_DIRS})

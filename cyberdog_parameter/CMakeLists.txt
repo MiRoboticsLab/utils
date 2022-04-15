@@ -16,10 +16,6 @@ endif()
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/functions.cmake")
 project_initialize_config_parameter()
 
-install(DIRECTORY config/ 
-  DESTINATION share/${PROJECT_NAME}/config/
-)
-
 # find dependencies
 find_package(ament_cmake REQUIRED) 
 find_package(cyberdog_common REQUIRED)
