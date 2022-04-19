@@ -23,6 +23,7 @@
 #include <iostream>
 #include <string>
 #include <mutex>
+#include <vector>
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
@@ -466,19 +467,68 @@ public:
     return true;
   }
 
-  static bool Get(const json::Document & doc, const char * key, int & value)
+  static bool Get(const json::Document & doc, const char * key, std::vector<float> & value)
   {
     if (!doc.IsObject()) {
       ERROR("[%s] %s: Failed! Input doc should be kObejectType!", CYBERDOGJSON, __func__);
       return false;
     }
-    if (!doc.HasMember(key) || !doc[key].IsInt()) {
+    if (!doc.HasMember(key)) {
       return false;
     }
 
-    if (doc[key].IsInt()) {
-      value = doc[key].GetInt();
+    auto questions = doc[key].GetArray();
+    for (int i = 0; i < questions.Size(); i++) {
+      if (!questions[i].IsFloat()) {
+        return false;
+      }
+      value.push_back(questions[i].GetFloat());
     }
+    return true;
+  }
+
+  static bool Get(const json::Document & doc, const char * key, int32_t & value)
+  {
+    if (!doc.IsObject()) {
+      ERROR("[%s] %s: Failed! Input doc should be kObejectType!", CYBERDOGJSON, __func__);
+      return false;
+    }
+    if (!doc.HasMember(key)) {
+      return false;
+    }
+
+    if (!doc[key].IsInt()) {
+      return false;
+    }
+
+    std::cout << " goes here value " << value << std::endl;
+    value = doc[key].GetInt();
+    return true;
+  }
+
+  static bool Get(const json::Document & doc, const char * key, uint32_t & value)
+  {
+    if (!doc.IsObject()) {
+      ERROR("[%s] %s: Failed! Input doc should be kObejectType!", CYBERDOGJSON, __func__);
+      return false;
+    }
+    if (!doc.HasMember(key) || !doc[key].IsUint()) {
+      return false;
+    }
+    value = doc[key].GetUint();
+    return true;
+  }
+
+  static bool Get(const json::Document & doc, const char * key, int64_t & value)
+  {
+    if (!doc.IsObject()) {
+      ERROR("[%s] %s: Failed! Input doc should be kObejectType!", CYBERDOGJSON, __func__);
+      return false;
+    }
+    if (!doc.HasMember(key) || !doc[key].IsInt64()) {
+      return false;
+    }
+    value = doc[key].GetInt64();
     return true;
   }
 
@@ -491,7 +541,6 @@ public:
     if (!doc.HasMember(key) || !doc[key].IsUint64()) {
       return false;
     }
-
     value = doc[key].GetUint64();
     return true;
   }
@@ -565,20 +614,6 @@ public:
     }
 
     value = val[key].GetString();
-    return true;
-  }
-
-  static bool Get(const json::Value & val, const char * key, int & value)
-  {
-    if (!val.IsObject()) {
-      // ERROR("[%s] %s: Failed! Input val should be kObejectType!", CYBERDOGJSON, __func__);
-      return false;
-    }
-    if (!val.HasMember(key) || !val[key].IsInt()) {
-      return false;
-    }
-
-    value = val[key].GetInt();
     return true;
   }
 
