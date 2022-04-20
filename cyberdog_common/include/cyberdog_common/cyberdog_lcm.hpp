@@ -22,6 +22,8 @@
 #include <functional>
 #include <atomic>
 
+#define  LCM_ADDR  "udpm://239.255.76.67:7667?ttl=1"
+
 namespace cyberdog
 {
 namespace common
@@ -54,7 +56,7 @@ public:
       response_name_ = std::string("_response");
     }
 
-    lcm_ptr_ = std::make_shared<lcm::LCM>();
+    lcm_ptr_ = std::make_shared<lcm::LCM>(LCM_ADDR);
     is_service_valid_ = true;
     lcm_ptr_->subscribe(response_name_, &LcmClient<Req, Res>::ResponseCallback, this);
   }
@@ -148,7 +150,7 @@ public:
   : request_name_(name + std::string("_request")),
     response_name_(name + std::string("_response"))
   {
-    lcm_ptr_ = std::make_shared<lcm::LCM>();
+    lcm_ptr_ = std::make_shared<lcm::LCM>(LCM_ADDR);
     callback_ = func;
     lcm_ptr_->subscribe(request_name_, &LcmServer<Req, Res>::RequestCallback, this);
   }
