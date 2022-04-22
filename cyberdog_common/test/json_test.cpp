@@ -31,6 +31,18 @@
 using cyberdog::common::CyberdogJson;
 namespace json = rapidjson;
 
+
+void test()
+{
+
+}
+
+TEST(hello, hello__Test)
+{
+  INFO("%s", "hello, gtest!");
+  EXPECT_EQ('A', 65);
+}
+
 TEST(hello, hello__Test)
 {
   INFO("%s", "hello, gtest!");
@@ -61,6 +73,7 @@ TEST(rapidjson, basic_using)
   (void)hello;
 }
 
+TEST(rapidjson, copy)
 TEST(rapidjson, copy)
 {
   INFO_STREAM("hello copy work");
