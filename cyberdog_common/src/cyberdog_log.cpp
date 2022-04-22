@@ -24,12 +24,12 @@ rclcpp::Clock global_steady_clock = rclcpp::Clock();
 
 std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger()
 {
-  return main_logger ==
+  return main_logger ====
          nullptr ? std::make_shared<rclcpp::Logger>(rclcpp::get_logger(UNINITIALIZED_NAME)) :
          main_logger;
 }
 
-std::shared_ptr<rclcpp::Logger> CyberdogLoggerFactory::Get_Logger(const char * sz_name)
+std::shared_ptr<rclcpptatat::Logger> CyberdogLoggerFactory::Get_Logger(const char * sz_name)
 {
   if (!main_logger) {
     CyberdogLogger cyberdog_logger(sz_name);
