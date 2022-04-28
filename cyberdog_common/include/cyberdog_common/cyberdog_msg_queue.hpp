@@ -100,7 +100,7 @@ public:
 
   bool IsEmpty()
   {
-    std::unique_lock<std::mutex> lk(data_lock_);
+    // std::unique_lock<std::mutex> lk(data_lock_);
     return data_list_.empty();
   }
 
