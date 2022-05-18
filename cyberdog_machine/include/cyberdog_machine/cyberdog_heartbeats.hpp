@@ -18,6 +18,8 @@
 #include <memory>
 #include <map>
 #include <utility>
+#include <thread>
+#include <condition_variable>
 #include "rclcpp/node.hpp"
 #include "cyberdog_common/cyberdog_json.hpp"
 
@@ -27,22 +29,18 @@ namespace machine
 {
 struct HeartClick
 {
-  void Push()
+  uint8_t Push()
   {
-    data_ = true;
+    uint8_t tmp_val = count_.fetch_add(1);
+    return tmp_val;
   }
 
-  bool Pop()
+  void Pop()
   {
-    if (data_ == false) {
-      return false;
-    } else {
-      data_ = false;
-    }
-    return true;
+    count_.store(0);
   }
 
-  std::atomic_bool data_ {false};
+  std::atomic_uint8_t count_ {0};
 };  // struct HeartQueue
 
 /**
@@ -52,27 +50,41 @@ struct HeartClick
 class HeartBeats
 {
   using BeatsMap = std::map<std::string, std::shared_ptr<HeartClick>>;
-  using BeatsCounterMap = std::map<std::string, int8_t>;
 
 public:
   /**
    * @brief Construct a new Heart Beats object
    *
-   * @param name 模块名字，具备全局唯一性
    * @param duration 心跳发送、检测间隔，
    * @param lost_limit 丢失/超时 限制，达到该次数会触发心跳异常
    */
-  HeartBeats(const std::string & name, int32_t duration, int8_t lost_limit)
-  : name_(name), beats_duration_(duration), lost_limit_(lost_limit)
+  HeartBeats(int32_t duration, int8_t lost_limit,
+        std::function<void()> on_keep = nullptr,
+        std::function<void(const std::string &, bool)> on_lost = nullptr)
+  : beats_duration_(duration), lost_limit_(lost_limit),
+    keep_callback_(on_keep), lost_callback_(on_lost),
+    notify_callback_(std::function<void()>())
   {}
-  ~HeartBeats() {}
+  virtual ~HeartBeats() {
+    {
+      std::lock_guard<std::mutex> lck(exit_mut_);
+      exit_ = true;
+      exit_cond_.notify_all();
+    }
+    if(thread_check_.joinable())
+      thread_check_.join();
+    if(thread_cycle_.joinable())
+      thread_cycle_.join();
+  }
 
   /**
    * @brief 配置心跳监听对象，单一发送模块不需要配置
    *
    * @param target_vec 监听对象name容器
    */
-  void HeartConfig(const std::vector<std::string> & target_vec)
+  void HeartConfig(const std::vector<std::string> & target_vec,
+    std::function<void()> on_notify = std::function<void()>(),
+    int32_t notify_duration = 0)
   {
     if (target_vec.empty()) {
       return;
@@ -81,8 +93,9 @@ public:
       std::string tmp_name = std::string(*iter);
       auto tmp_ptr = std::make_shared<HeartClick>();
       beats_map_.insert(std::make_pair(tmp_name, tmp_ptr));
-      beats_counter_map_.insert(std::make_pair(tmp_name, 0));
     }
+    notify_callback_ = on_notify;
+    notify_interval_ = notify_duration / beats_duration_;
   }
 
   /**
@@ -92,15 +105,15 @@ public:
    * @return true
    * @return false
    */
-  bool HeartRegisterListener(std::function<void(const std::string &)> callback)
+  bool RegisterLostCallback(std::function<void(const std::string &, bool)> on_lost)
   {
     if (beats_map_.empty()) {
       return false;
     }
-    if (callback == nullptr) {
+    if (on_lost == nullptr) {
       return false;
     } else {
-      lost_callback_ = callback;
+      lost_callback_ = on_lost;
     }
     return true;
   }
@@ -112,15 +125,12 @@ public:
    * @return true
    * @return false
    */
-  bool HeartRegisterPublisher(std::function<void()> callback)
+  bool RegisterKeepCallback(std::function<void()> on_keep)
   {
-    // if (beats_map_.empty()) {
-    //   return false;
-    // }
-    if (callback == nullptr) {
+    if (on_keep == nullptr) {
       return false;
     } else {
-      publish_callback_ = callback;
+      keep_callback_ = on_keep;
     }
     return true;
   }
@@ -135,7 +145,7 @@ public:
     auto iter = beats_map_.find(name);
     if (iter != beats_map_.end()) {
       std::cout << "receive once" << std::endl;
-      iter->second->Push();
+      iter->second->Pop();
     }
   }
 
@@ -146,56 +156,69 @@ public:
   void HeartRun()
   {
     if (lost_callback_ != nullptr) {
-      std::cout << "heartrun 1\n";
-      auto t = std::thread(std::bind(&HeartBeats::BeatsCheck, this));
-      t.detach();
+      std::cout << "heartrun check\n";
+      // auto t = std::thread(std::bind(&HeartBeats::BeatsCheck, this));
+      // t.detach();
+      thread_check_ = std::thread(std::bind(&HeartBeats::BeatsCheck, this));
     }
-    if (publish_callback_ != nullptr) {
-      std::cout << "heartrun 2\n";
-      auto t = std::thread(std::bind(&HeartBeats::BeatsPublish, this));
-      t.detach();
+    if (keep_callback_ != nullptr) {
+      std::cout << "heartrun keep\n";
+      // auto t = std::thread(std::bind(&HeartBeats::BeatsCycle, this));
+      // t.detach();
+      thread_cycle_ = std::thread(std::bind(&HeartBeats::BeatsCycle, this));
     }
   }
 
 private:
-  void BeatsPublish()
+  void BeatsCycle()
   {
-    while (true) {
-      publish_callback_();
-      std::this_thread::sleep_for(std::chrono::milliseconds(beats_duration_));
+    while (!exit_) {
+      keep_callback_();
+      {
+        std::unique_lock<std::mutex> lck(exit_mut_);
+        exit_cond_.wait_for(lck, std::chrono::milliseconds(beats_duration_), [this]{return exit_ == true;});
+      }      
     }
   }
 
   void BeatsCheck()
   {
-    while (true) {
+    int8_t interval_cnt = 0;
+    while (!exit_) {
       for (auto iter = beats_map_.begin(); iter != beats_map_.end(); ++iter) {
-        std::string tmp_name(iter->first.c_str());
-        auto counter_iter = beats_counter_map_.find(tmp_name);
-        if (!iter->second->Pop()) {
-          if (++counter_iter->second >= lost_limit_) {
-            lost_callback_(tmp_name);
-          } else {
-            continue;
-          }
+        if (iter->second->Push() >= lost_limit_) {
+          lost_callback_(iter->first, true);
         } else {
-          counter_iter->second = 0;
+          lost_callback_(iter->first, false);
         }
       }
-      std::this_thread::sleep_for(std::chrono::milliseconds(beats_duration_));
+      if(++interval_cnt >= notify_interval_)
+      {
+        interval_cnt = 0;
+        notify_callback_();
+      }
+      {
+        std::unique_lock<std::mutex> lck(exit_mut_);
+        exit_cond_.wait_for(lck, std::chrono::milliseconds(beats_duration_), [this]{return exit_ == true;});
+      }
     }
   }
 
 private:
-  std::function<void(const std::string &)> lost_callback_;
-  std::function<void()> publish_callback_;
+  std::function<void(const std::string &, bool)> lost_callback_;
+  std::function<void()> keep_callback_;
+  std::function<void()> notify_callback_;
 
 private:
-  std::string name_;
   int32_t beats_duration_ {1000};       // 心跳间隔
   int8_t lost_limit_ {5};               // 连续丢失容忍上限
-  BeatsMap beats_map_;                  // 心跳刷新机制实现map
-  BeatsCounterMap beats_counter_map_;   // 心跳异常检测map
+  int8_t notify_interval_ {0};           // 通知间隔
+  BeatsMap beats_map_;                  // 心跳刷新及异常检测机制实现map
+  bool exit_ {false};                   // 退出标志
+  std::thread thread_check_;
+  std::thread thread_cycle_;
+  std::mutex exit_mut_;
+  std::condition_variable exit_cond_;
 };  // class HeartBeats
 }  // namespace machine
 }  // namespace cyberdog

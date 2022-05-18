@@ -34,7 +34,7 @@ class HeartbeatsTest : public cyberdog::machine::HeartBeats
 {
 public:
   HeartbeatsTest(const std::string & name, int32_t duration, int8_t limit)
-  : HeartBeats(name, duration, limit), name_(name)
+  : HeartBeats(duration, limit), name_(name)
   {
     node_ptr_ = rclcpp::Node::make_shared(name_);
     pub_ptr_ = node_ptr_->create_publisher<protocol::msg::Heartbeats>("heartbeats_test_topic", 10);
@@ -54,11 +54,12 @@ public:
     target_vec.push_back(name_);
 
     // 配置心跳管理
-    HeartConfig(target_vec);
+    HeartConfig(target_vec, std::bind(&HeartbeatsTest::HeartbeatsNotify, this));
 
     // 注册监听回调和发送回调
-    HeartRegisterListener(std::bind(&HeartbeatsTest::LostCallback, this, std::placeholders::_1));
-    HeartRegisterPublisher(std::bind(&HeartbeatsTest::PublishCallback, this));
+    RegisterLostCallback(std::bind(&HeartbeatsTest::LostCallback, this,
+      std::placeholders::_1, std::placeholders::_2));
+    RegisterKeepCallback(std::bind(&HeartbeatsTest::PublishCallback, this));
 
     // 启动心跳
     HeartRun();
@@ -72,9 +73,10 @@ public:
   }
 
 private:
-  void LostCallback(const std::string & name)
+  void LostCallback(const std::string & name, bool lost)
   {
-    std::cout << name_ << " lost heartbeats with " << name << std::endl;
+    std::cout << name_ << " lost heartbeats with " << name 
+      <<" is " << (lost==true ? "lost":"alive") << std::endl;
     std::fflush(stdout);
   }
 
@@ -99,6 +101,10 @@ private:
     HeartUpdate(msg->name);
   }
 
+  void HeartbeatsNotify()
+  {
+  }
+
 private:
   std::string name_;
   protocol::msg::Heartbeats beats_msg_;
@@ -111,7 +117,7 @@ int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
   HeartbeatsTest heartbeats_test("hearttest", 500, 5);
-  heartbeats_test.HeartRun();
+  // heartbeats_test.HeartRun();
   heartbeats_test.Spin();
   return 0;
 }
