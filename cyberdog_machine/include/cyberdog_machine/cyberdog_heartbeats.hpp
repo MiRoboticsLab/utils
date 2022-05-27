@@ -65,6 +65,11 @@ public:
     keep_callback_(on_keep), lost_callback_(on_lost),
     notify_callback_(std::function<void()>())
   {}
+  HeartBeats(int32_t duration, std::function<void()> on_keep = nullptr)
+  : beats_duration_(duration), 
+    keep_callback_(on_keep), lost_callback_(nullptr),
+    notify_callback_(std::function<void()>())
+  {}  
   virtual ~HeartBeats() {
     {
       std::lock_guard<std::mutex> lck(exit_mut_);
