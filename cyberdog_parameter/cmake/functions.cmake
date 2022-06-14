@@ -48,9 +48,9 @@ macro(generate_parameter_dynamic_library FILENAME MODULE)
 
     execute_process(
         COMMAND
-            mkdir -p ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}      
+          mkdir -p ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}      
         COMMAND
-          cp ${PROJECT_BINARY_DIR}/test_toml.so ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/
+          cp ${PROJECT_BINARY_DIR}/${MODULE}.so ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}/
         WORKING_DIRECTORY
             ${PROJECT_BINARY_DIR}
     )    
