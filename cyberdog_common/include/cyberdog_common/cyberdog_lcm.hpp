@@ -22,7 +22,7 @@
 #include <functional>
 #include <atomic>
 
-#define  LCM_ADDR  "udpm://239.255.76.67:7667?ttl=255"
+#define  LCM_ADDR  "udpm://239.255.76.67:8689?ttl=1"
 
 namespace cyberdog
 {
