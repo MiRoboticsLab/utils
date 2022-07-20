@@ -149,7 +149,7 @@ public:
   {
     auto iter = beats_map_.find(name);
     if (iter != beats_map_.end()) {
-      std::cout << "receive once" << std::endl;
+      // std::cout << "receive once" << std::endl;
       iter->second->Pop();
     }
   }
