@@ -40,12 +40,13 @@ public:
   }
 
 /* Msg Queue opened API */
+
 public:
   /**
    * @brief 入队函数
    *        1. 会在队首原址构造
    *        2. 如果有等待出队线程，会唤醒一次
-   * 
+   *
    * @param t 只支持构造该消息队列类时选择实例化的模板
    */
   void EnQueue(const T & t)
@@ -63,7 +64,7 @@ public:
    *        1. 会在队首原址构造
    *        2. 如果有等待出队线程，会唤醒一次
    *        3. 会保持队列不超过一个的数据，用于click场景
-   * 
+   *
    * @param t 只支持构造该消息队列类时选择实例化的模板
    */
   void EnQueueOne(const T & t)
@@ -85,7 +86,7 @@ public:
    *          1. 如果队列非空，则消耗掉一个数据，并将该数据引用返回
    *          2. 如果队列为空，则进入条件等待，直到有数据入队
    *          3. 如果等待状态中发生析构，则会返回失败，此时引用参数不可用，其行为是未定义的
-   * 
+   *
    * @param t 只支持构造该消息队列类时选择实例化的模板
    * @return true 获取数据成功
    * @return false 获取数据失败
@@ -108,7 +109,7 @@ public:
 
   /**
    * @brief 重置队列，此时所有等待函数会得到失败的返回值并解锁
-   * 
+   *
    */
   void Reset()
   {
@@ -132,6 +133,7 @@ public:
   }
 
 /* Internal API */
+
 private:
   bool IsWait()
   {
