@@ -69,6 +69,7 @@ if(LOCAL_BUILD_TESTING)
   ament_add_gtest(tomltest test/toml_test.cpp src/cyberdog_log.cpp)
   ament_add_gtest(logtest test/log_test.cpp src/cyberdog_log.cpp)
   ament_add_gtest(lcmtest test/lcm_test.cpp src/cyberdog_log.cpp)
+  ament_add_gtest(msgqueuetest test/msg_queue_test.cpp src/cyberdog_log.cpp)
   target_link_libraries(lcmtest lcm)
   target_compile_definitions(tomltest PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
   target_compile_definitions(jsontest PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_common")
@@ -76,8 +77,9 @@ if(LOCAL_BUILD_TESTING)
   ament_target_dependencies(jsontest rclcpp rapidjson)
   ament_target_dependencies(logtest rclcpp)
   ament_target_dependencies(lcmtest rclcpp xpack)
+  ament_target_dependencies(msgqueuetest rclcpp)
   install(TARGETS
-    jsontest tomltest logtest lcmtest
+    jsontest tomltest logtest lcmtest msgqueuetest
     DESTINATION lib/${PROJECT_NAME})
   install(FILES
     test/benchmark.toml test/benchmark.json test/test_cs.lcm
