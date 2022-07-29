@@ -17,6 +17,7 @@
 #include <list>
 #include <mutex>
 #include <condition_variable>
+#include <atomic>
 
 namespace cyberdog
 {
@@ -28,7 +29,7 @@ class MsgQueue
 public:
   MsgQueue()
   {
-    SetWait(false);
+    ResetWait();
   }
 
   ~MsgQueue()
@@ -54,7 +55,7 @@ public:
     std::unique_lock<std::mutex> lk(data_lock_);
     data_list_.emplace_front(t);
     if (IsWait()) {
-      SetWait(false);
+      GetWait();
       read_signal_.notify_one();
     }
   }
@@ -75,7 +76,7 @@ public:
     } else {
       data_list_.emplace_front(t);
       if (IsWait()) {
-        SetWait(false);
+        GetWait();
         read_signal_.notify_one();
       }
     }
@@ -95,7 +96,7 @@ public:
   {
     std::unique_lock<std::mutex> lk(data_lock_);
     if (data_list_.empty()) {
-      SetWait(true);
+      SetWait();
       read_signal_.wait(lk);
     }
     if (IsEmpty()) {
@@ -115,7 +116,7 @@ public:
   {
     Clear();
     if (IsWait()) {
-      SetWait(false);
+      ResetWait();
       read_signal_.notify_all();
     }
   }
@@ -137,12 +138,24 @@ public:
 private:
   bool IsWait()
   {
-    return is_wait_;
+    return is_wait_ == 0 ? false : true;
   }
 
-  void SetWait(bool wait_flag)
+  void SetWait()
   {
-    is_wait_ = wait_flag;
+    is_wait_++;
+  }
+
+  void GetWait()
+  {
+    if (is_wait_ > 0) {
+      is_wait_--;
+    }
+  }
+
+  void ResetWait()
+  {
+    is_wait_ = 0;
   }
 
   void Clear()
@@ -157,7 +170,7 @@ private:
   std::condition_variable read_signal_;
   std::mutex data_lock_;
   std::list<T> data_list_;
-  bool is_wait_;
+  std::atomic<int32_t> is_wait_;
 };  // class MsgQueue
 }  // namespace common
 }  // namespace cyberdog
