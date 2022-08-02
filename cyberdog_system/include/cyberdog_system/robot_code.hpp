@@ -26,52 +26,120 @@ namespace system
  */
 enum class ModuleCode : int32_t
 {
+  kUnknown = -1,
+
 //  manager code
   kRobot = 100,      // cyberdog global manager
-  kDevice = 200,
-  kMotion = 300,
-  kSensor = 400,
-
-//  core code
-  kAudio = 5200,
-  kConnector = 1100,
-  kCheck = 1200,
-  kRemote = 1300,
-  kNavigation = 3100,  // from motion
-  kVisualProgram = 5100,  // from interaction
+  kServer = 200,     //  200, 400, 500
+  kBridgeGrpc = 300,
+  kBridgeNet = 600,
+  kAPP = 700,  // 700 - 899
 
 //  device code
-  kLed = 2100,
-  kWifi = 2200,
-  kBms = 2300,
-  kTouch = 2400,
+  kDeviceManager = 1000,
+  kLED = 1100,
+  kMiniLED = 1200,
+  kWifi = 1300,
+  kBms = 1400,
+  kTouch = 1500,
 
 // sensor code
-  kCamera = 4100,
-  kTof = 4200,
-  kUltrasonic = 4300,
-  kGps = 4400,
+  kSensorManager = 2000,
+  kLidar = 2100,
+  kToF = 2200,
+  kUltrasonic = 2300,
+  kGPS = 2400,
+
+// motion code
+  kMotionManager = 3000,
+  kMotionBoard = 3100,
+  kMotionUtils = 3200,
+
+// camera modules
+  kFollow = 4100,
+  kAI = 4200,
+  kMapNav = 4300,
+  kCameraServer = 4400,
+
+//  core code
+  kAudioNX = 5000,
+  kAudioBoard = 5100,
+  kConnector = 5200,
+  kNavigation = 5300,
+  kTransmission = 5400,
+  kFence = 5500,
+  kAFT = 5600,
+  kOTA = 5700,
+  kVisualProgram = 5800,
+  kFace = 5900
 };  // enum class ModuleCode
 
 /**
  * @brief Cyberdog system reserved code,
- *        (int) 0 - 30;
- *        All modules should set self-code between 31 - 99.
+ *        (int) 0 - 20;
+ *        All modules should set self-code between 21 - 99.
  */
 enum class KeyCode : int32_t
 {
-  kFailed = -1,
-  kOK = 0,
-  kStateInvalid = 1,
-  kStatusBusy = 2,
-  kStatusError = 3,
-  kNetError = 4,
-  kPermissionDenied = 5,
-  kTimeout = 6,
-  kUnSupport = 7,
-  kSelfCheckFailed = 8,
-  kParametersInvalid = 9,
+  kOK = 0,                      // 特别指令，结果正确 / 调用正常
+  kFailed = 1,                  // 无特别定义的失败，统一使用
+  kUninitialized = 2,           // 未初始化
+  kStateInvalid = 3,            // 状态机不允许
+  kStatusError = 4,             // 模块状态错误
+  kNetError = 5,                // 网络错误
+  kPermissionDenied = 6,        // 无操作权限
+  kTimeout = 7,                 // 超时
+  kUnSupport = 8,               // 指令不支持
+  kSelfCheckFailed = 9,         // 自检失败
+  kParametersInvalid = 10,      // 参数不合法
+  kTargetBusy = 11,             // 状态忙碌，用于独占性调用目标
+  kDeviceError = 12             // 硬件错误， 外设、传感器类使用
 };  // enum class KeyCode
+
+/**
+ * @brief 全局结果码封装类
+ *        使用方法可参考test/robot_code_test.cpp
+ *
+ * @tparam Code_T 模块自定义的编码class
+ */
+template<typename Code_T>
+class CyberdogCode final
+{
+public:
+  explicit CyberdogCode(ModuleCode module_code)
+  {
+    ModuleImpl_ = module_code;
+  }
+
+  ~CyberdogCode() {}
+
+  /**
+   * @brief Get the Key Code object
+   *
+   * @param code 预留关键码
+   * @return int32_t 转为int值的代码
+   */
+  int32_t GetKeyCode(KeyCode code)
+  {
+    return code ==
+           KeyCode::kOK ? static_cast<int32_t>(KeyCode::kOK) : static_cast<int32_t>(ModuleImpl_) +
+           static_cast<int32_t>(code);
+  }
+
+  /**
+   * @brief 获取模块自定义结果码
+   *
+   * @param code 自定义结果码
+   * @return int32_t 转为int值的代码
+   */
+  int32_t GetCode(Code_T code)
+  {
+    return static_cast<int32_t>(ModuleImpl_) + static_cast<int32_t>(code);
+  }
+
+private:
+  ModuleCode ModuleImpl_{ModuleCode::kUnknown};
+};  // calss CyberdogCode
 }  // namespace system
 }  // namespace cyberdog
 
