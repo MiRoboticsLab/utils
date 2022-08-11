@@ -478,7 +478,8 @@ public:
     }
 
     auto questions = doc[key].GetArray();
-    for (int i = 0; i < questions.Size(); i++) {
+    uint questions_size = questions.Size();
+    for (uint i = 0; i < questions_size; i++) {
       if (!questions[i].IsFloat()) {
         return false;
       }
