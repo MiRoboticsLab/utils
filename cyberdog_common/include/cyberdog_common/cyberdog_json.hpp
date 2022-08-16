@@ -259,6 +259,29 @@ public:
     return ret;
   }
 
+  static bool Add(
+    json::Document & doc, const std::string & keyName,
+    const std::vector<signed char> & vec)
+  {
+    bool ret = true;
+    if (!doc.IsObject()) {
+      ERROR(
+        "[%s] %s: failed! Doc shouled be json::kArrayType.", CYBERDOGJSON,
+        __func__);
+      ret = false;
+    } else {
+      json::Document::AllocatorType & allocator = doc.GetAllocator();
+      rapidjson::Value IntArray(rapidjson::kArrayType);
+      json::Value key(keyName.c_str(), allocator);
+      int size = vec.size();
+      for (int i = 0; i < size; i++) {
+        IntArray.PushBack(vec[i], allocator);
+      }
+      doc.AddMember(key, IntArray, allocator);
+    }
+    return ret;
+  }
+
 public:
   /* convert between string and json data */
   /**
