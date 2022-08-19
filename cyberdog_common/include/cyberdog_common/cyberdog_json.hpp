@@ -602,6 +602,27 @@ public:
     return true;
   }
 
+  static bool Get(const json::Document & doc, const char * key, double & value)
+  {
+    if (!doc.IsObject()) {
+      ERROR("[%s] %s: Failed! Input doc should be kObejectType!", CYBERDOGJSON, __func__);
+      return false;
+    }
+    if (!doc.HasMember(key) || !(doc[key].IsFloat() || doc[key].IsDouble() || doc[key].IsInt())) {
+      return false;
+    }
+
+    if (doc[key].IsFloat()) {
+      value = doc[key].GetFloat();
+    } else if (doc[key].IsDouble()) {
+      value = doc[key].GetDouble();
+    } else if (doc[key].IsInt()) {
+      value = doc[key].GetInt();
+    }
+
+    return true;
+  }
+
   static bool Get(const json::Document & doc, const char * key, bool & value)
   {
     if (!doc.IsObject()) {
