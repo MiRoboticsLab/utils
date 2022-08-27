@@ -58,28 +58,32 @@ public:
    * @param duration 心跳发送、检测间隔，
    * @param lost_limit 丢失/超时 限制，达到该次数会触发心跳异常
    */
-  HeartBeats(int32_t duration, int8_t lost_limit,
-        std::function<void()> on_keep = nullptr,
-        std::function<void(const std::string &, bool)> on_lost = nullptr)
+  HeartBeats(
+    int32_t duration, int8_t lost_limit,
+    std::function<void()> on_keep = nullptr,
+    std::function<void(const std::string &, bool)> on_lost = nullptr)
   : beats_duration_(duration), lost_limit_(lost_limit),
     keep_callback_(on_keep), lost_callback_(on_lost),
     notify_callback_(std::function<void()>())
   {}
   HeartBeats(int32_t duration, std::function<void()> on_keep = nullptr)
-  : beats_duration_(duration), 
+  : beats_duration_(duration),
     keep_callback_(on_keep), lost_callback_(nullptr),
     notify_callback_(std::function<void()>())
-  {}  
-  virtual ~HeartBeats() {
+  {}
+  virtual ~HeartBeats()
+  {
     {
       std::lock_guard<std::mutex> lck(exit_mut_);
       exit_ = true;
       exit_cond_.notify_all();
     }
-    if(thread_check_.joinable())
+    if (thread_check_.joinable()) {
       thread_check_.join();
-    if(thread_cycle_.joinable())
+    }
+    if (thread_cycle_.joinable()) {
       thread_cycle_.join();
+    }
   }
 
   /**
@@ -87,7 +91,8 @@ public:
    *
    * @param target_vec 监听对象name容器
    */
-  void HeartConfig(const std::vector<std::string> & target_vec,
+  void HeartConfig(
+    const std::vector<std::string> & target_vec,
     std::function<void()> on_notify = std::function<void()>(),
     int32_t notify_duration = 0)
   {
@@ -181,8 +186,11 @@ private:
       keep_callback_();
       {
         std::unique_lock<std::mutex> lck(exit_mut_);
-        exit_cond_.wait_for(lck, std::chrono::milliseconds(beats_duration_), [this]{return exit_ == true;});
-      }      
+        exit_cond_.wait_for(
+          lck, std::chrono::milliseconds(beats_duration_), [this] {
+            return exit_ == true;
+          });
+      }
     }
   }
 
@@ -197,14 +205,16 @@ private:
           lost_callback_(iter->first, false);
         }
       }
-      if(++interval_cnt >= notify_interval_)
-      {
+      if (++interval_cnt >= notify_interval_) {
         interval_cnt = 0;
         notify_callback_();
       }
       {
         std::unique_lock<std::mutex> lck(exit_mut_);
-        exit_cond_.wait_for(lck, std::chrono::milliseconds(beats_duration_), [this]{return exit_ == true;});
+        exit_cond_.wait_for(
+          lck, std::chrono::milliseconds(beats_duration_), [this] {
+            return exit_ == true;
+          });
       }
     }
   }

@@ -57,8 +57,10 @@ public:
     HeartConfig(target_vec, std::bind(&HeartbeatsTest::HeartbeatsNotify, this));
 
     // 注册监听回调和发送回调
-    RegisterLostCallback(std::bind(&HeartbeatsTest::LostCallback, this,
-      std::placeholders::_1, std::placeholders::_2));
+    RegisterLostCallback(
+      std::bind(
+        &HeartbeatsTest::LostCallback, this,
+        std::placeholders::_1, std::placeholders::_2));
     RegisterKeepCallback(std::bind(&HeartbeatsTest::PublishCallback, this));
 
     // 启动心跳
@@ -75,8 +77,8 @@ public:
 private:
   void LostCallback(const std::string & name, bool lost)
   {
-    std::cout << name_ << " lost heartbeats with " << name 
-      <<" is " << (lost==true ? "lost":"alive") << std::endl;
+    std::cout << name_ << " lost heartbeats with " << name <<
+      " is " << (lost == true ? "lost" : "alive") << std::endl;
     std::fflush(stdout);
   }
 
