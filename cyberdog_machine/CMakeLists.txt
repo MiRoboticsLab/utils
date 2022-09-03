@@ -12,15 +12,27 @@ install(DIRECTORY include/
   DESTINATION include/)
 
 if(LOCAL_BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_lint_auto REQUIRED)
   find_package(rclcpp REQUIRED)
   find_package(protocol REQUIRED)
+  find_package(cyberdog_common REQUIRED)
   include_directories(include)
   include_directories(test)
   add_executable(heartbeats_test test/heartbeats_test.cpp)
   ament_target_dependencies(heartbeats_test rclcpp protocol)
+  ament_add_gtest(fs_machine_test_controller test/fs_machine_test_controller.cpp)
+  ament_add_gtest(fs_machine_test_actuator1 test/fs_machine_test_actuator1.cpp)
+  ament_add_gtest(fs_machine_test_actuator2 test/fs_machine_test_actuator2.cpp)
+  ament_target_dependencies(fs_machine_test_controller rclcpp protocol cyberdog_common)
+  ament_target_dependencies(fs_machine_test_actuator1 rclcpp protocol cyberdog_common)
+  ament_target_dependencies(fs_machine_test_actuator2 rclcpp protocol cyberdog_common)
+  target_compile_definitions(fs_machine_test_controller PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_machine")
   install(TARGETS
-    heartbeats_test
+    heartbeats_test fs_machine_test_controller fs_machine_test_actuator1  fs_machine_test_actuator2
+    DESTINATION lib/${PROJECT_NAME})
+  install(FILES
+    test/fs_machine_test_config.toml
     DESTINATION lib/${PROJECT_NAME})
   ament_lint_auto_find_test_dependencies()
 endif()
