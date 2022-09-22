@@ -524,8 +524,6 @@ public:
     if (!doc[key].IsInt()) {
       return false;
     }
-
-    std::cout << " goes here value " << value << std::endl;
     value = doc[key].GetInt();
     return true;
   }
