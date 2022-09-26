@@ -2,14 +2,14 @@
 actuators = ["test1", "test2"]
 states = ["SetUp", "TearDown", "SelfCheck", "Active", "DeActive", "Protected", "LowPower", "OTA", "Error"]
 default_time = 100 # milliseconds
-default_states = "Uninitialized"
+default_state = "Uninitialized"
 
 
 [actuator.test1]
 states = ["SetUp", "TearDown", "SelfCheck", "Active", "DeActive", "Protected", "LowPower", "OTA", "Error"]
-time = [100, 100, 100, 100, 100, 100, 100, 100, 100]
+times = [100, 100, 100, 100, 100, 100, 100, 100, 100]
 
 
 [actuator.test2]
 states = ["SetUp", "TearDown", "SelfCheck", "Active", "DeActive", "Protected", "LowPower", "OTA", "Error"]
-time = [100, 100, 100, 100, 100, 100, 100, 100, 100]
+times = [100, 100, 100, 100, 100, 100, 100, 100, 100]
