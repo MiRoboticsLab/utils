@@ -28,6 +28,8 @@ if(LOCAL_BUILD_TESTING)
   ament_target_dependencies(fs_machine_test_actuator1 rclcpp protocol cyberdog_common)
   ament_target_dependencies(fs_machine_test_actuator2 rclcpp protocol cyberdog_common)
   target_compile_definitions(fs_machine_test_controller PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_machine")
+  target_compile_definitions(fs_machine_test_actuator1 PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_machine")
+  target_compile_definitions(fs_machine_test_actuator2 PRIVATE BenchmarkPath="${CMAKE_INSTALL_PREFIX}/lib/cyberdog_machine")
   install(TARGETS
     heartbeats_test fs_machine_test_controller fs_machine_test_actuator1  fs_machine_test_actuator2
     DESTINATION lib/${PROJECT_NAME})
