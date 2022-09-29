@@ -610,10 +610,10 @@ public:
       return false;
     }
 
-    if (doc[key].IsFloat()) {
-      value = doc[key].GetFloat();
-    } else if (doc[key].IsDouble()) {
+    if (doc[key].IsDouble()) {
       value = doc[key].GetDouble();
+    } else if (doc[key].IsFloat()) {
+      value = doc[key].GetFloat();
     } else if (doc[key].IsInt()) {
       value = doc[key].GetInt();
     }
