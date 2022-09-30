@@ -28,11 +28,15 @@ TEST(basic, build_and_print)
   auto Actuator_2 = std::string("test2");
   INFO("FS Machine running");
   rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("FSController");
-  if(node_ptr == nullptr) {
+  if (node_ptr == nullptr) {
     INFO("node ptr create failed!");
   }
-  std::shared_ptr<cyberdog::machine::MachineController> machine_ptr = std::make_shared<cyberdog::machine::MachineController>();
-  if(! machine_ptr->MachineControllerInit(std::string(BenchmarkPath) + "/fs_machine_test_config.toml", node_ptr)) {
+  std::shared_ptr<cyberdog::machine::MachineController> machine_ptr =
+    std::make_shared<cyberdog::machine::MachineController>();
+  if (!machine_ptr->MachineControllerInit(
+      std::string(BenchmarkPath) +
+      "/fs_machine_test_config.toml", node_ptr))
+  {
     ERROR("Test FS Machine Init failed!");
     return;
   }
@@ -61,33 +65,40 @@ TEST(basic, build_and_print)
 
 /**
  * @brief Demo code for using MachineController
- * 
+ *
  */
 class ControllerDemo final
 {
-std::string Uninitialized_V = std::string("Uninitialized");
-std::string SetUp_V = std::string("SetUp");
-std::string SelfCheck_V = std::string("SelfCheck");
-std::string Active_V = std::string("Active");
-std::string DeActive_V = std::string("DeActive");
-std::string Protected_V = std::string("Protected");
-std::string LowPower_V = std::string("LowPower");
-std::string OTA_V = std::string("OTA");
-std::string Error_V = std::string("Error");
-std::string Actuator_1 = std::string("test1");
-std::string Actuator_2 = std::string("test2");
+  std::string Uninitialized_V = std::string("Uninitialized");
+  std::string SetUp_V = std::string("SetUp");
+  std::string SelfCheck_V = std::string("SelfCheck");
+  std::string Active_V = std::string("Active");
+  std::string DeActive_V = std::string("DeActive");
+  std::string Protected_V = std::string("Protected");
+  std::string LowPower_V = std::string("LowPower");
+  std::string OTA_V = std::string("OTA");
+  std::string Error_V = std::string("Error");
+  std::string Actuator_1 = std::string("test1");
+  std::string Actuator_2 = std::string("test2");
+
 public:
-  ControllerDemo(const std::string & name) : name_(name){
+  ControllerDemo(const std::string & name)
+  : name_(name)
+  {
 
   }
   ~ControllerDemo() {}
-  bool Init() {
+  bool Init()
+  {
     node_ptr_ = rclcpp::Node::make_shared(name_);
     machine_controller_ptr_ = std::make_shared<cyberdog::machine::MachineController>();
-    if(!machine_controller_ptr_->MachineControllerInit(std::string(BenchmarkPath) + "/fs_machine_test_config.toml", node_ptr_)) {
+    if (!machine_controller_ptr_->MachineControllerInit(
+        std::string(BenchmarkPath) +
+        "/fs_machine_test_config.toml", node_ptr_))
+    {
       ERROR("Test FS Machine Init failed!");
       return false;
-    } else if(! machine_controller_ptr_->WaitActuatorsSetUp()) {
+    } else if (!machine_controller_ptr_->WaitActuatorsSetUp()) {
       ERROR("Test FS Machine Init failed, actuators setup failed!");
       return false;
     } else {
@@ -96,14 +107,15 @@ public:
     }
   }
 
-  void Run() {
-    if(!machine_controller_ptr_->SetState(SelfCheck_V)) {
+  void Run()
+  {
+    if (!machine_controller_ptr_->SetState(SelfCheck_V)) {
       ERROR("selfcheck failed, cannot running!");
       return;
     }
     std::vector<std::string> state_vec{Active_V, DeActive_V, OTA_V, Protected_V, LowPower_V};
     int8_t counter = 0;
-    while(true) {
+    while (true) {
       // 模拟真实执行场景
       counter = counter % 5;
       std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -111,6 +123,7 @@ public:
       counter++;
     }
   }
+
 private:
   std::string name_;
   rclcpp::Node::SharedPtr node_ptr_{nullptr};
@@ -122,7 +135,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   LOGGER_MAIN_INSTANCE("FSController");
   auto demo_ptr = std::make_shared<ControllerDemo>("controller_demo");
-  if(!demo_ptr->Init()) {
+  if (!demo_ptr->Init()) {
     ERROR("init failed, program will exit with error!");
     return -1;
   }

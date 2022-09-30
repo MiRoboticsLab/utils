@@ -25,28 +25,34 @@ enum class DemoCode : int32_t
 
 class ActuatorDemo : public cyberdog::machine::MachineActuator
 {
-std::string Uninitialized_V = std::string("Uninitialized");
-std::string SetUp_V = std::string("SetUp");
-std::string TearDown_V = std::string("TearDown");
-std::string SelfCheck_V = std::string("SelfCheck");
-std::string Active_V = std::string("Active");
-std::string DeActive_V = std::string("DeActive");
-std::string Protected_V = std::string("Protected");
-std::string LowPower_V = std::string("LowPower");
-std::string OTA_V = std::string("OTA");
-std::string Error_V = std::string("Error");
+  std::string Uninitialized_V = std::string("Uninitialized");
+  std::string SetUp_V = std::string("SetUp");
+  std::string TearDown_V = std::string("TearDown");
+  std::string SelfCheck_V = std::string("SelfCheck");
+  std::string Active_V = std::string("Active");
+  std::string DeActive_V = std::string("DeActive");
+  std::string Protected_V = std::string("Protected");
+  std::string LowPower_V = std::string("LowPower");
+  std::string OTA_V = std::string("OTA");
+  std::string Error_V = std::string("Error");
+
 public:
   explicit ActuatorDemo(const std::string & name)
   : MachineActuator(name),
-  name_(name) {
+    name_(name)
+  {
     node_ptr_ = rclcpp::Node::make_shared(name_);
     code_ptr_ = std::make_shared<cyberdog::system::CyberdogCode<DemoCode>>(
-    cyberdog::system::ModuleCode::kRobot);
+      cyberdog::system::ModuleCode::kRobot);
   }
   ~ActuatorDemo() {}
 
-  bool Init() {
-    if(!this->MachineActuatorInit(std::string(BenchmarkPath) + "/fs_machine_test_config.toml", node_ptr_)) {
+  bool Init()
+  {
+    if (!this->MachineActuatorInit(
+        std::string(BenchmarkPath) + "/fs_machine_test_config.toml",
+        node_ptr_))
+    {
       ERROR("Init failed, actuator init error.");
       return false;
     }
@@ -62,48 +68,60 @@ public:
     return this->ActuatorStart();
   }
 
-  void Spin() {
+  void Spin()
+  {
     INFO("ActuatorDemo: %s spin.", name_.c_str());
     rclcpp::spin(this->node_ptr_);
   }
+
 private:
   /* 实现状态机虚函数，满足系统要求 */
-  int32_t OnSetUp() {
+  int32_t OnSetUp()
+  {
     INFO("ActuatorDemo on setup.");
     return code_ptr_->GetKeyCode(cyberdog::system::KeyCode::kOK);
   }
-  int32_t ONTearDown() {
+  int32_t ONTearDown()
+  {
     INFO("ActuatorDemo on teardown.");
     return code_ptr_->GetKeyCode(cyberdog::system::KeyCode::kOK);
   }
-  int32_t OnSelfCheck() {
+  int32_t OnSelfCheck()
+  {
     INFO("ActuatorDemo on selfcheck.");
     return code_ptr_->GetKeyCode(cyberdog::system::KeyCode::kOK);
   }
-  int32_t OnActive() {
+  int32_t OnActive()
+  {
     INFO("ActuatorDemo on active.");
     return code_ptr_->GetKeyCode(cyberdog::system::KeyCode::kOK);
   }
-  int32_t OnDeActive() {
+  int32_t OnDeActive()
+  {
     INFO("ActuatorDemo on deactive.");
     return code_ptr_->GetKeyCode(cyberdog::system::KeyCode::kOK);
   }
-  int32_t OnProtected() {
+  int32_t OnProtected()
+  {
     INFO("ActuatorDemo on protected.");
     return code_ptr_->GetKeyCode(cyberdog::system::KeyCode::kOK);
   }
-  int32_t OnLowPower() {
+  int32_t OnLowPower()
+  {
     INFO("ActuatorDemo on lowpower.");
     return code_ptr_->GetKeyCode(cyberdog::system::KeyCode::kOK);
   }
-  int32_t OnOTA() {
+  int32_t OnOTA()
+  {
     INFO("ActuatorDemo on OTA.");
     return code_ptr_->GetKeyCode(cyberdog::system::KeyCode::kOK);
   }
-  int32_t OnError() {
+  int32_t OnError()
+  {
     INFO("ActuatorDemo on OTA.");
     return code_ptr_->GetKeyCode(cyberdog::system::KeyCode::kOK);
   }
+
 private:
   std::string name_;
   rclcpp::Node::SharedPtr node_ptr_ {nullptr};
@@ -117,7 +135,7 @@ int main(int argc, char ** argv)
   LOGGER_MAIN_INSTANCE("ActuatorTest1");
   INFO("Running");
   std::shared_ptr<ActuatorDemo> ptr = std::make_shared<ActuatorDemo>("test1");
-  if(!ptr->Init()) {
+  if (!ptr->Init()) {
     ERROR("init failed!");
     return -1;
   }

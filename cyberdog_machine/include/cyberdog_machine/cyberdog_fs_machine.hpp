@@ -19,11 +19,12 @@
 #define CYBERDOG_MACHINE__CYBERDOG_FS_MACHINE_HPP_
 #include <string>
 #include <memory>
-#include <chrono>  
+#include <chrono>
 #include <vector>
 #include <map>
 #include <algorithm>
 #include <functional>
+#include <utility>
 #include "rclcpp/node.hpp"
 #include "cyberdog_common/cyberdog_json.hpp"
 #include "cyberdog_common/cyberdog_toml.hpp"
@@ -34,12 +35,12 @@ namespace cyberdog
 {
 namespace machine
 {
-constexpr int32_t kError_state_time = -1; 
+constexpr int32_t kError_state_time = -1;
 const char * kMachine_service_name = "machine_service";
 
 /**
  * @brief 状态机指令，用来区分查询与设置
- * 
+ *
  */
 enum class StateCmd : uint8_t
 {
@@ -49,48 +50,58 @@ enum class StateCmd : uint8_t
 
 /**
  * @brief 控制器配置参数管理类
- * 
+ *
  */
 class ControllerParams
 {
 public:
-  bool Build(const toml::value & controller) {
+  bool Build(const toml::value & controller)
+  {
     toml::array actuators;
-    if(!common::CyberdogToml::Get(controller, "actuators", actuators_vec_)) {
+    if (!common::CyberdogToml::Get(controller, "actuators", actuators_vec_)) {
       ERROR("Build ControllerParams failed, cannot get actuators!");
       return false;
     }
     toml::array states;
-    if(!common::CyberdogToml::Get(controller, "states", states_vec_)) {
+    if (!common::CyberdogToml::Get(controller, "states", states_vec_)) {
       ERROR("Build ControllerParams failed, cannot get states!");
       return false;
     }
-    if(!common::CyberdogToml::Get(controller, "default_time", default_time_)) {
+    if (!common::CyberdogToml::Get(controller, "default_time", default_time_)) {
       ERROR("Build ControllerParams failed, cannot get default time!");
       return false;
     }
-    if(!common::CyberdogToml::Get(controller, "default_state", default_state_)) {
+    if (!common::CyberdogToml::Get(controller, "default_state", default_state_)) {
       ERROR("Build ControllerParams failed, cannot get default state!");
       return false;
     }
     return true;
   }
 
-  bool CheckActuator(const std::string & actuator) {
-    return std::find(actuators_vec_.begin(), actuators_vec_.end(), actuator) == actuators_vec_.end() ? false : true;
+  bool CheckActuator(const std::string & actuator)
+  {
+    return std::find(
+      actuators_vec_.begin(), actuators_vec_.end(),
+      actuator) == actuators_vec_.end() ? false : true;
   }
 
-  bool CheckState(const std::string & state) {
-    return std::find(states_vec_.begin(), states_vec_.end(), state) == states_vec_.end() ? false : true;
+  bool CheckState(const std::string & state)
+  {
+    return std::find(
+      states_vec_.begin(), states_vec_.end(),
+      state) == states_vec_.end() ? false : true;
   }
 
-  int32_t GetDefaultTime() {
+  int32_t GetDefaultTime()
+  {
     return default_time_;
   }
 
-  const std::string & GetDefaultState() {
+  const std::string & GetDefaultState()
+  {
     return default_state_;
   }
+
 private:
   std::vector<std::string> actuators_vec_;
   std::vector<std::string> states_vec_;
@@ -100,17 +111,18 @@ private:
 
 /**
  * @brief 执行器配置参数管理类
- * 
+ *
  */
 class ActuatorParams final
 {
 public:
-  bool Build(const toml::array & states, const toml::array & times) {
-    if(states.size() != times.size()) {
+  bool Build(const toml::array & states, const toml::array & times)
+  {
+    if (states.size() != times.size()) {
       ERROR("Build ActuatorParams failed, states size is not equal with times!");
       return false;
     }
-    for(size_t i = 0; i < states.size(); i++) {
+    for (size_t i = 0; i < states.size(); i++) {
       states_map_.insert(std::make_pair(states[i].as_string(), times[i].as_integer()));
     }
     return true;
@@ -118,13 +130,14 @@ public:
 
   /**
    * @brief 获取状态机切换时间开销
-   * 
+   *
    * @param state 目标状态机
    * @return int32_t 单位毫秒
    */
-  int32_t GetTime(const std::string & state) const {
+  int32_t GetTime(const std::string & state) const
+  {
     auto iter = states_map_.find(state);
-    if(iter != states_map_.end()) {
+    if (iter != states_map_.end()) {
       return iter->second;
     } else {
       ERROR("GetTime failed, state invalid!");
@@ -134,18 +147,21 @@ public:
 
   /**
    * @brief 检测执行器是否注册了该状态
-   * 
+   *
    * @param state 目标状态
    * @return true 检测成功
    * @return false 检测失败，此时不应该切换该目标状态，否则执行器不会有对应动作
    */
-  bool CheckState(const std::string & state) const {
+  bool CheckState(const std::string & state) const
+  {
     return states_map_.find(state) == states_map_.end() ? false : true;
   }
 
-  size_t GetStatesNum() const {
+  size_t GetStatesNum() const
+  {
     return states_map_.size();
   }
+
 private:
   std::map<std::string, int32_t> states_map_;
   std::string current_state_;
@@ -153,25 +169,28 @@ private:
 
 /**
  * @brief 状态机控制器类
- * 
+ *
  */
 class MachineController
 {
-using FSMACHINE_SRV_T = protocol::srv::FsMachine;
-using FS_CLINET_T = rclcpp::Client<FSMACHINE_SRV_T>::SharedPtr;
+  using FSMACHINE_SRV_T = protocol::srv::FsMachine;
+  using FS_CLINET_T = rclcpp::Client<FSMACHINE_SRV_T>::SharedPtr;
+
 public:
-  MachineController() {
+  MachineController()
+  {
     controller_params_ptr_ = std::make_shared<ControllerParams>();
   }
-  ~MachineController() {
-    // TODO: clear all container
+  ~MachineController()
+  {
+    // future: clear all container
   }
 
   /* 状态机不允许通过转移、赋值、拷贝来构造 */
   MachineController(const MachineController &) = delete;
-  MachineController& operator=(const MachineController &) = delete;
+  MachineController & operator=(const MachineController &) = delete;
   MachineController(MachineController &&) = delete;
-  MachineController& operator=(MachineController &&) = delete;
+  MachineController & operator=(MachineController &&) = delete;
 
 public:
   /**
@@ -179,37 +198,38 @@ public:
    *          1. 检测配置文件合法性，合法性规则详见状态机设计文档
    *          2. 构造控制器的一系列管理容器
    *          3. 初始化工作结束后，运行时不再依赖toml文件
-   * 
+   *
    * @param node_ptr ros指针，用于内置与执行器的切换通信
    * @return true 只有返回初始化成功，才可以使用状态机
    * @return false 若初始化失败，状态机不可用，否则在切换、查询中其行为未定义
    */
-  bool MachineControllerInit(const std::string& config_file, rclcpp::Node::SharedPtr node_ptr) {
+  bool MachineControllerInit(const std::string & config_file, rclcpp::Node::SharedPtr node_ptr)
+  {
     INFO("Init FS Machine.");
 
-    if(node_ptr == nullptr) {
+    if (node_ptr == nullptr) {
       ERROR("FS Machine init failed, ros node pointer is invalid!");
       return false;
     } else {
       node_ptr_ = node_ptr;
     }
-    
+
     toml::value config;
-    if(!common::CyberdogToml::ParseFile(config_file, config)) {
+    if (!common::CyberdogToml::ParseFile(config_file, config)) {
       ERROR("Parse FS Machine config file failed, toml file is invalid!");
       return false;
     }
     toml::value controller;
-    if(!common::CyberdogToml::Get(config, "controller", controller)) {
+    if (!common::CyberdogToml::Get(config, "controller", controller)) {
       ERROR("FS Machine init failed, parse controller config failed!");
       return false;
-    } else if(!BuildControllerParams(controller)) {
+    } else if (!BuildControllerParams(controller)) {
       ERROR("FS Machine init failed, build controller failed!");
       return false;
     }
 
     // toml::array actuator_array;
-    if(!common::CyberdogToml::Get(controller, "actuators", target_vec_)) {
+    if (!common::CyberdogToml::Get(controller, "actuators", target_vec_)) {
       ERROR("FS Machine init failed, parse actuator array failed!");
       return false;
     }
@@ -218,16 +238,16 @@ public:
     BuildStateMap();
 
     toml::value actuator;
-    if(!common::CyberdogToml::Get(config, "actuator", actuator)) {
+    if (!common::CyberdogToml::Get(config, "actuator", actuator)) {
       ERROR("FS Machine init failed, parse actuators config failed!");
       return false;
-    } else if(!BuildActuatorMap(actuator)) {
+    } else if (!BuildActuatorMap(actuator)) {
       ERROR("FS Machine init failed, build actuators params failed!");
       return false;
     }
 
     /* controller中的actuator与单独声明的actuator数量要求一致，检测失败则返回错误 */
-    if(actuator.size() != target_vec_.size()) {
+    if (actuator.size() != target_vec_.size()) {
       ERROR("FS Machine init failed, actuator size invalid!");
       return false;
     }
@@ -237,33 +257,39 @@ public:
 
   /**
    * @brief 阻塞函数，等待所有执行器接入状态机
-   * 
+   *
    * @return true 全部接入成功
    * @return false 超时
    */
-  bool WaitActuatorsSetUp() {
+  bool WaitActuatorsSetUp()
+  {
     INFO("MachineController wait for all actuators setup, size: %ld.", actuator_map_.size());
-    auto result = std::all_of(actuator_map_.cbegin(), actuator_map_.cend(), [this](const auto & iter){
-      INFO("Waiting for service: %s", iter.first.c_str());
-      auto client_iter = this->client_map_.find(iter.first);
-      if(client_iter == client_map_.end()) {
-        ERROR("MachineController waot actuator: %s setup failed, maybe has an error while building.", iter.first.c_str());
-        return false;
-      }
-      
-      auto time_cost = iter.second.GetTime("SetUp");
-      if(time_cost == kError_state_time) {
-        ERROR("MachineController wait actuator: %s setup failed, cannot get time!", iter.first.c_str());
-        return false;
-      }
-      if(!client_iter->second->wait_for_service(std::chrono::milliseconds(time_cost))){  // 使用config里的软编码
-        ERROR("MachineController wait actuator: %s setup failed, timeout!", iter.first.c_str());
-        return false;
-      }
-      INFO("MachineController wait actuator: %s setup OK.", iter.first.c_str());
-      return true;
-    });
-    if(! result) {
+    auto result = std::all_of(
+      actuator_map_.cbegin(), actuator_map_.cend(), [this](const auto & iter) {
+        INFO("Waiting for service: %s", iter.first.c_str());
+        auto client_iter = this->client_map_.find(iter.first);
+        if (client_iter == client_map_.end()) {
+          ERROR(
+            "MachineController waot actuator: %s setup failed, maybe has an error while building.",
+            iter.first.c_str());
+          return false;
+        }
+
+        auto time_cost = iter.second.GetTime("SetUp");
+        if (time_cost == kError_state_time) {
+          ERROR(
+            "MachineController wait actuator: %s setup failed, cannot get time!",
+            iter.first.c_str());
+          return false;
+        }
+        if (!client_iter->second->wait_for_service(std::chrono::milliseconds(time_cost))) {
+          ERROR("MachineController wait actuator: %s setup failed, timeout!", iter.first.c_str());
+          return false;
+        }
+        INFO("MachineController wait actuator: %s setup OK.", iter.first.c_str());
+        return true;
+      });
+    if (!result) {
       ERROR("MachineController wait all actuators setup failed, state machine cannot work!");
     } else {
       INFO("MachineController wait all actuators setup OK.");
@@ -273,10 +299,11 @@ public:
 
   /**
    * @brief 获取状态机管理字典，预留功能
-   * 
-   * @param state_map 
+   *
+   * @param state_map
    */
-  void GetStateMap(std::map<std::string, std::string> & state_map) {
+  void GetStateMap(std::map<std::string, std::string> & state_map)
+  {
     state_map = state_map_;
   }
 
@@ -284,14 +311,15 @@ public:
    * @brief 查询特定执行器的状态
    *          1. 该状态由controller的map维护，不需要动态进程间查询
    *          2. 执行器名称合法性由控制器配置管理，状态机字典此时在初始化检测时已经保证了安全性
-   * 
+   *
    * @param target_actuator 查询目标
    * @param state 查询结果
    * @return true 参数是否合法
    * @return false 返回失败时，引用状态可能为空，其使用后程序行为未定义
    */
-  bool GetState(const std::string & target_actuator, std::string & state) {
-    if(!controller_params_ptr_->CheckActuator(target_actuator)) {
+  bool GetState(const std::string & target_actuator, std::string & state)
+  {
+    if (!controller_params_ptr_->CheckActuator(target_actuator)) {
       ERROR("GetState failed, target: %s is invalid!", target_actuator.c_str());
       return false;
     }
@@ -301,36 +329,44 @@ public:
 
   /**
    * @brief 设置特定Actuator的状态
-   * 
+   *
    * @param target_actuator 目标name
    * @param target_state 目标状态
    * @return true 略。
    * @return false 如果返回失败，则目标状态为前一个状态，不受影响
    */
-  bool SetState(const std::string & target_actuator, const std::string & target_state) {
-    if(!controller_params_ptr_->CheckActuator(target_actuator)) {
+  bool SetState(const std::string & target_actuator, const std::string & target_state)
+  {
+    if (!controller_params_ptr_->CheckActuator(target_actuator)) {
       ERROR("SetState failed, target actuator is invalid!");
       return false;
     }
-    if(!controller_params_ptr_->CheckState(target_state)) {
+    if (!controller_params_ptr_->CheckState(target_state)) {
       ERROR("SetState failed, target state is invalid!");
       return false;
     }
     auto iter = client_map_.find(target_actuator);
-    if(iter == client_map_.end()) {
-      ERROR("MachineController set state failed, get target actuator: %s client failed!", target_actuator.c_str());
+    if (iter == client_map_.end()) {
+      ERROR(
+        "MachineController set state failed, get target actuator: %s client failed!",
+        target_actuator.c_str());
       return false;
     }
     auto request = std::make_shared<FSMACHINE_SRV_T::Request>();
     request->target_state = target_state;
     auto response = std::make_shared<FSMACHINE_SRV_T::Response>();
     auto result = iter->second->async_send_request(request);
-    if(rclcpp::spin_until_future_complete(node_ptr_, result, std::chrono::seconds(2)) != rclcpp::FutureReturnCode::SUCCESS){
+    if (rclcpp::spin_until_future_complete(
+        node_ptr_, result,
+        std::chrono::seconds(2)) != rclcpp::FutureReturnCode::SUCCESS)
+    {
       ERROR("MachineController set state failed, get service result failed!");
       return false;
     }
-    if(result.get()->code != static_cast<int32_t>(cyberdog::system::KeyCode::kOK)) {
-      ERROR("MachineController set state failed, result code is not OK, expect 0 but actual is: %d.", result.get()->code);
+    if (result.get()->code != static_cast<int32_t>(cyberdog::system::KeyCode::kOK)) {
+      ERROR(
+        "MachineController set state failed, result code is not OK, expect 0 but actual is: %d.",
+        result.get()->code);
       return false;
     }
     UpdateState(target_actuator, target_state);
@@ -339,48 +375,51 @@ public:
 
   /**
    * @brief 设置全局状态机
-   * 
+   *
    * @param target_state 目标状态
-   * @return true 
-   * @return false 
+   * @return true
+   * @return false
    */
-  bool SetState(const std::string & target_state) {
+  bool SetState(const std::string & target_state)
+  {
     INFO("MachineController set global state: %s", target_state.c_str());
-    auto set_result = std::all_of(target_vec_.cbegin(), target_vec_.cend(), [this, target_state](const std::string & name) {
-      INFO("all of name: %s, target: %s", name.c_str(), target_state.c_str());
-      if(!SetState(name, target_state)) {
-        ERROR("MachineController set state faild, target: %s, state: %s", name.c_str(), target_state.c_str());
-        return false;
-      }
-      return true;
-    });
+    auto set_result = std::all_of(
+      target_vec_.cbegin(), target_vec_.cend(), [this, target_state](const std::string & name) {
+        INFO("all of name: %s, target: %s", name.c_str(), target_state.c_str());
+        if (!SetState(name, target_state)) {
+          ERROR(
+            "MachineController set state faild, target: %s, state: %s", name.c_str(),
+            target_state.c_str());
+          return false;
+        }
+        return true;
+      });
     INFO("MachineController set state result: %s", set_result == true ? "true" : "false");
     return set_result;
   }
+
 private:
   /* Internal API */
   /**
    * @brief 构建状态记录字典
-   * 
+   *
    */
-  void BuildStateMap() {
-    for(size_t i = 0;i < target_vec_.size(); i++) {  // TODO: 是否有更优雅的读取-添加方案 ？
-      // std::string tmp;
-      // common::CyberdogToml::Get(target_array, i, tmp);
+  void BuildStateMap()
+  {
+    INFO("BuildStateMap on call");
+    for (size_t i = 0; i < target_vec_.size(); i++) {
       state_map_.insert(std::make_pair(target_vec_[i], controller_params_ptr_->GetDefaultState()));
     }
   }
 
   /**
    * @brief 创建ros客户端字典
-   * 
+   *
    */
-  void BuildClientMap() {
+  void BuildClientMap()
+  {
     INFO("BuildClientMap on call");
-    for(size_t i = 0;i < target_vec_.size(); i++) {  // TODO: 是否有更优雅的读取-添加方案 ？
-      // std::string tmp;
-      // common::CyberdogToml::Get(target_array, i, tmp);
-      // target_vec_.emplace_back(tmp);
+    for (size_t i = 0; i < target_vec_.size(); i++) {
       std::string client_name = target_vec_[i] + std::string(kMachine_service_name);
       auto client = node_ptr_->create_client<protocol::srv::FsMachine>(client_name);
       client_map_.insert(std::make_pair(target_vec_[i], std::move(client)));
@@ -389,49 +428,52 @@ private:
 
   /**
    * @brief 构造执行器管理字典，用于后续通过key快速查询并操作
-   * 
+   *
    * @param actuator_params 配置文件中的执行器参数，数据格式为toml:table
    * @return true 构造成功
    * @return false 失败时，后续状态机操作不可用
    */
-  bool BuildActuatorMap(const toml::value & actuator_params) {
+  bool BuildActuatorMap(const toml::value & actuator_params)
+  {
     INFO("BuildActuatorMap on call.");
-    return std::all_of(target_vec_.cbegin(), target_vec_.cend(), [this, & actuator_params](const std::string & name){
-      toml::value params;
-      if(!common::CyberdogToml::Get(actuator_params, name, params)) {
-        ERROR("BuildActuatorMap failed, cannot parse params!");
-        return false;
-      }
-      if(!BuildActuatorParams(name, params)) {
-        ERROR("BuildActuatorMap failed, cannot build params!");
-        return false;
-      }
-      return true;
-    });
+    return std::all_of(
+      target_vec_.cbegin(), target_vec_.cend(), [this, &actuator_params](const std::string & name) {
+        toml::value params;
+        if (!common::CyberdogToml::Get(actuator_params, name, params)) {
+          ERROR("BuildActuatorMap failed, cannot parse params!");
+          return false;
+        }
+        if (!BuildActuatorParams(name, params)) {
+          ERROR("BuildActuatorMap failed, cannot build params!");
+          return false;
+        }
+        return true;
+      });
   }
 
   /**
    * @brief 构造执行器字典的一条数据
-   * 
+   *
    * @param name 执行器名称
    * @param params 执行器参数，来自配置文件
    * @return true 构造成功
    * @return false 失败时，后续状态机操作不可用
    */
-  bool BuildActuatorParams(const std::string name, const toml::value & params) {
+  bool BuildActuatorParams(const std::string name, const toml::value & params)
+  {
     INFO("BuildActuatorParams on call.");
     toml::array states;
-    if(!common::CyberdogToml::Get(params, "states", states)) {
+    if (!common::CyberdogToml::Get(params, "states", states)) {
       ERROR("BuildActuatorParams failed, cannot parse param states!");
       return false;
     }
     toml::array times;
-    if(!common::CyberdogToml::Get(params, "times", times)) {
+    if (!common::CyberdogToml::Get(params, "times", times)) {
       ERROR("BuildActuatorParams failed, cannot parse param times!");
       return false;
     }
     ActuatorParams actuator_params;
-    if(!actuator_params.Build(states, times)) {
+    if (!actuator_params.Build(states, times)) {
       ERROR("BuildActuatorPrams failed!");
       return false;
     } else {
@@ -442,24 +484,27 @@ private:
 
   /**
    * @brief 构造控制器参数管理类
-   * 
-   * @param controller_params 
+   *
+   * @param controller_params
    * @return true 构造成功
    * @return false 失败时，后续状态机操作不可用
    */
-  bool BuildControllerParams(const toml::value & controller_params) {
+  bool BuildControllerParams(const toml::value & controller_params)
+  {
     return controller_params_ptr_->Build(controller_params);
   }
 
   /**
    * @brief 更新状态机记录字典
-   * 
-   * @param target_actuator 
-   * @param target_state 
+   *
+   * @param target_actuator
+   * @param target_state
    */
-  void UpdateState(const std::string & target_actuator, const std::string & target_state) {
+  void UpdateState(const std::string & target_actuator, const std::string & target_state)
+  {
     state_map_.find(target_actuator)->second = target_state;
   }
+
 private:
   std::vector<std::string> target_vec_;               // 执行器容器
   rclcpp::Node::SharedPtr node_ptr_ {nullptr};        // 节点指针，用于内置进程间Ros通信
@@ -471,64 +516,67 @@ private:
 
 /**
  * @brief 状态机执行器类
- * 
+ *
  */
 class MachineActuator
 {
-using FSMACHINE_SRV_T = protocol::srv::FsMachine;
+  using FSMACHINE_SRV_T = protocol::srv::FsMachine;
+
 public:
-  explicit MachineActuator(const std::string & name) : name_(name) {}
+  explicit MachineActuator(const std::string & name)
+  : name_(name) {}
   ~MachineActuator() {}
 
   /* 状态机不允许通过转移、赋值、拷贝来构造 */
   MachineActuator(const MachineActuator &) = delete;
-  MachineActuator& operator=(const MachineActuator &) = delete;
+  MachineActuator & operator=(const MachineActuator &) = delete;
   MachineActuator(MachineActuator &&) = delete;
-  MachineActuator& operator=(MachineActuator &&) = delete;
+  MachineActuator & operator=(MachineActuator &&) = delete;
 
 public:
   /**
    * @brief 初始化状态机
    *        若该操作失败，则后续状态机行为是未定义的
-   * 
-   * @param node_ptr 
-   * @return true 
-   * @return false 
+   *
+   * @param node_ptr
+   * @return true
+   * @return false
    */
-  bool MachineActuatorInit(const std::string & config_file, rclcpp::Node::SharedPtr node_ptr) {
+  bool MachineActuatorInit(const std::string & config_file, rclcpp::Node::SharedPtr node_ptr)
+  {
     INFO("MachineActuator Init on call");
     toml::value config;
-    if(!common::CyberdogToml::ParseFile(config_file, config)) {
+    if (!common::CyberdogToml::ParseFile(config_file, config)) {
       ERROR("MachineActuator Init failed, toml file is invalid!");
       return false;
     }
     toml::value actuator;
-    if(!common::CyberdogToml::Get(config, "actuator", actuator)) {
+    if (!common::CyberdogToml::Get(config, "actuator", actuator)) {
       ERROR("MachineActuator Init failed, parse actuators config failed!");
       return false;
     }
     toml::value params;
-    if(!common::CyberdogToml::Get(actuator, name_, params)) {
+    if (!common::CyberdogToml::Get(actuator, name_, params)) {
       ERROR("MachineActuator Init failed, parse %s's params config failed!", name_.c_str());
       return false;
     }
     toml::array states;
-    if(!common::CyberdogToml::Get(params, "states", states)) {
+    if (!common::CyberdogToml::Get(params, "states", states)) {
       ERROR("MachineActuator Init failed, parse params states failed!");
       return false;
     }
     toml::array times;
-    if(!common::CyberdogToml::Get(params, "times", times)) {
+    if (!common::CyberdogToml::Get(params, "times", times)) {
       ERROR("MachineActuator Init failed, parse params times failed!");
       return false;
     }
     params_ptr_ = std::make_shared<ActuatorParams>();
-    if(!params_ptr_->Build(states, times)) {
+    if (!params_ptr_->Build(states, times)) {
       ERROR("MachineActuator Init failed, build actuator params failed!");
       return false;
     }
-    
-    if(node_ptr == nullptr) {
+
+    if (node_ptr == nullptr) {
       ERROR("MachineActuator Init failed, node pointer is invalid!");
       return false;
     } else {
@@ -538,12 +586,13 @@ public:
   }
   /**
    * @brief 注册回调函数,需要将配置中支持的状态机全部注册
-   * 
+   *
    * @param state 目标状态
    * @param callback 回调函数
    */
-  void RegisterStateCallback(const std::string & state, std::function<int32_t(void)> callback) {
-    if(!params_ptr_->CheckState(state)) {
+  void RegisterStateCallback(const std::string & state, std::function<int32_t(void)> callback)
+  {
+    if (!params_ptr_->CheckState(state)) {
       ERROR("MachineActuator regitster callback failed, state: %s is invalid!", state.c_str());
     } else {
       state_callback_map_.insert(std::make_pair(state, callback));
@@ -552,16 +601,17 @@ public:
 
   /**
    * @brief 启动状态机执行器
-   * 
+   *
    * @return true 成功则状态机正常运行
    * @return false 返回失败，状态机不可用
    */
-  bool ActuatorStart() {
+  bool ActuatorStart()
+  {
     INFO("MachineActuator start on call.");
-    if(state_callback_map_.size() != params_ptr_->GetStatesNum()) {
+    if (state_callback_map_.size() != params_ptr_->GetStatesNum()) {
       ERROR("Actuator start failed, register callback error!");
       return false;
-    } else if(state_callback_map_.find("SetUp") == state_callback_map_.end()){
+    } else if (state_callback_map_.find("SetUp") == state_callback_map_.end()) {
       ERROR("Actuator start failed, cannot setup!");
       return false;
     } else {
@@ -573,31 +623,43 @@ public:
   }
 
 private:
-  void ServiceSetUp() {
+  void ServiceSetUp()
+  {
     INFO("MachineActuator service setup on call.");
     std::string service_name = name_ + std::string(kMachine_service_name);
-    machine_service_ptr_ = node_ptr_->create_service<FSMACHINE_SRV_T>(service_name, std::bind(&MachineActuator::ServiceCallback, this, std::placeholders::_1, std::placeholders::_2));
+    machine_service_ptr_ =
+      node_ptr_->create_service<FSMACHINE_SRV_T>(
+      service_name,
+      std::bind(
+        &MachineActuator::ServiceCallback, this, std::placeholders::_1,
+        std::placeholders::_2));
   }
 
-  void ServiceCallback(const FSMACHINE_SRV_T::Request::SharedPtr request, FSMACHINE_SRV_T::Response::SharedPtr response) {
-    INFO("MachineActuator service callback on call.\n\t ===> target_state: %s", request->target_state.c_str());
+  void ServiceCallback(
+    const FSMACHINE_SRV_T::Request::SharedPtr request,
+    FSMACHINE_SRV_T::Response::SharedPtr response)
+  {
+    INFO(
+      "MachineActuator service callback on call.\n\t ===> target_state: %s",
+      request->target_state.c_str());
     response->code = CheckoutState(request->target_state);
   }
 
   /**
    * @brief 检出状态机回调
-   * 
+   *
    * @param state 目标状态
    * @return int32_t 返回值，遵循系统返回码设计
    */
-  int32_t CheckoutState(const std::string & state) {
+  int32_t CheckoutState(const std::string & state)
+  {
     INFO("MachineActuator checkout state: %s.", state.c_str());
-    if(!params_ptr_->CheckState(state)) {
+    if (!params_ptr_->CheckState(state)) {
       INFO("MachineActuator has no state: %s, skip once.", state.c_str());
       return static_cast<int32_t>(system::KeyCode::kUnSupport);
     }
     auto iter = state_callback_map_.find(state);
-    if(iter == state_callback_map_.end()) {
+    if (iter == state_callback_map_.end()) {
       ERROR("MachineActuator checkout state: %s failed, has no such callback.", state.c_str());
       return static_cast<int32_t>(system::KeyCode::kUnSupport);
     } else {
