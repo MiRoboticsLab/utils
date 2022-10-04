@@ -11,6 +11,10 @@ find_package(ament_cmake REQUIRED)
 install(DIRECTORY include/
   DESTINATION include/)
 
+install(FILES
+    config/fs_machine_config.toml
+    DESTINATION lib/${PROJECT_NAME})
+
 if(LOCAL_BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_lint_auto REQUIRED)

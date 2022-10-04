@@ -36,7 +36,8 @@ namespace cyberdog
 namespace machine
 {
 constexpr int32_t kError_state_time = -1;
-const char * kMachine_service_name = "machine_service";
+const char * kMachineServiceName = "machine_service";
+const char * kConfigFile = "./fs_machine_config.toml";
 
 /**
  * @brief 状态机指令，用来区分查询与设置
@@ -203,9 +204,11 @@ public:
    * @return true 只有返回初始化成功，才可以使用状态机
    * @return false 若初始化失败，状态机不可用，否则在切换、查询中其行为未定义
    */
-  bool MachineControllerInit(const std::string & config_file, rclcpp::Node::SharedPtr node_ptr)
+  bool MachineControllerInit(
+    const std::string & config_file = kConfigFile,
+    rclcpp::Node::SharedPtr node_ptr = nullptr)
   {
-    INFO("Init FS Machine.");
+    INFO("Init FS Machine, config file: %s", config_file.c_str());
 
     if (node_ptr == nullptr) {
       ERROR("FS Machine init failed, ros node pointer is invalid!");
@@ -356,9 +359,10 @@ public:
     request->target_state = target_state;
     auto response = std::make_shared<FSMACHINE_SRV_T::Response>();
     auto result = iter->second->async_send_request(request);
+    auto time_cost = actuator_map_.find(target_actuator)->second.GetTime(target_state);
     if (rclcpp::spin_until_future_complete(
         node_ptr_, result,
-        std::chrono::seconds(2)) != rclcpp::FutureReturnCode::SUCCESS)
+        std::chrono::seconds(time_cost)) != rclcpp::FutureReturnCode::SUCCESS)
     {
       ERROR("MachineController set state failed, get service result failed!");
       return false;
@@ -420,7 +424,7 @@ private:
   {
     INFO("BuildClientMap on call");
     for (size_t i = 0; i < target_vec_.size(); i++) {
-      std::string client_name = target_vec_[i] + std::string(kMachine_service_name);
+      std::string client_name = target_vec_[i] + std::string(kMachineServiceName);
       auto client = node_ptr_->create_client<protocol::srv::FsMachine>(client_name);
       client_map_.insert(std::make_pair(target_vec_[i], std::move(client)));
     }
@@ -512,6 +516,7 @@ private:
   std::map<std::string, std::string> state_map_;          // 状态机记录字典
   std::map<std::string, ActuatorParams> actuator_map_;
   std::shared_ptr<ControllerParams> controller_params_ptr_;
+  static std::string config_file_;
 };  // class MachineController
 
 /**
@@ -542,9 +547,11 @@ public:
    * @return true
    * @return false
    */
-  bool MachineActuatorInit(const std::string & config_file, rclcpp::Node::SharedPtr node_ptr)
+  bool MachineActuatorInit(
+    const std::string & config_file = kConfigFile,
+    rclcpp::Node::SharedPtr node_ptr = nullptr)
   {
-    INFO("MachineActuator Init on call");
+    INFO("MachineActuator Init, config file: %s", config_file.c_str());
     toml::value config;
     if (!common::CyberdogToml::ParseFile(config_file, config)) {
       ERROR("MachineActuator Init failed, toml file is invalid!");
@@ -626,7 +633,7 @@ private:
   void ServiceSetUp()
   {
     INFO("MachineActuator service setup on call.");
-    std::string service_name = name_ + std::string(kMachine_service_name);
+    std::string service_name = name_ + std::string(kMachineServiceName);
     machine_service_ptr_ =
       node_ptr_->create_service<FSMACHINE_SRV_T>(
       service_name,
