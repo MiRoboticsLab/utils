@@ -160,7 +160,7 @@ private:
 
   void Clear()
   {
-    std::unique_lock<std::mutex> lk(data_lock_);
+    // std::unique_lock<std::mutex> lk(data_lock_);
     while (!data_list_.empty()) {
       data_list_.pop_front();
     }
