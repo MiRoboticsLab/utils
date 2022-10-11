@@ -31,13 +31,13 @@
 #include "cyberdog_common/cyberdog_log.hpp"
 #include "cyberdog_system/robot_code.hpp"
 #include "protocol/srv/fs_machine.hpp"
+
+#define kConfigFile  "./fs_machine_config.toml"
+
 namespace cyberdog
 {
 namespace machine
 {
-constexpr int32_t kError_state_time = -1;
-const char * kMachineServiceName = "machine_service";
-const char * kConfigFile = "./fs_machine_config.toml";
 
 /**
  * @brief 状态机指令，用来区分查询与设置
@@ -48,6 +48,60 @@ enum class StateCmd : uint8_t
   kQuery = 0,  // 查询
   kSet = 1     // 设置
 };  // enum class StateCmd
+
+enum class MachineState : uint8_t
+{
+  MS_Uninitialized = 0,
+  MS_SetUp = 1,
+  MS_TearDown = 2,
+  MS_SelfCheck = 3,
+  MS_Active = 4,
+  MS_DeActive = 5,
+  MS_Protected = 6,
+  MS_LowPower = 7,
+  MS_OTA = 8,
+  MS_Error = 9,
+  MS_Unkown = 10
+};  // enum class MachineState
+
+class MachineContext
+{
+public:
+  std::string Context(MachineState ms)
+  {
+    if (state_map_.find(ms) == state_map_.end())
+    {
+      ERROR("set state error! machine state value not exsit!");
+      return Unkown_V;
+    }
+    return state_map_.at(ms);    
+  }
+private:
+  const std::string Uninitialized_V{"Uninitialized"};
+  const std::string SetUp_V{"SetUp"};
+  const std::string TearDown_V{"TearDown"};
+  const std::string SelfCheck_V{"SelfCheck"};
+  const std::string Active_V{"Active"};
+  const std::string DeActive_V{"DeActive"};
+  const std::string Protected_V{"Protected"};
+  const std::string LowPower_V{"LowPower"};
+  const std::string OTA_V{"OTA"};
+  const std::string Error_V{"Error"};
+  const std::string Unkown_V{"Error"};
+  const std::map<MachineState, std::string> state_map_ = {
+    {MachineState::MS_Uninitialized, Uninitialized_V},
+    {MachineState::MS_SetUp, SetUp_V},
+    {MachineState::MS_TearDown, TearDown_V},
+    {MachineState::MS_SelfCheck, SelfCheck_V},
+    {MachineState::MS_Active, Active_V},
+    {MachineState::MS_DeActive, DeActive_V},
+    {MachineState::MS_Protected, Protected_V},
+    {MachineState::MS_LowPower, LowPower_V},
+    {MachineState::MS_OTA, OTA_V},
+    {MachineState::MS_Error, Error_V},
+    {MachineState::MS_Unkown, Unkown_V},
+  };  
+};
 
 /**
  * @brief 控制器配置参数管理类
@@ -166,6 +220,7 @@ public:
 private:
   std::map<std::string, int32_t> states_map_;
   std::string current_state_;
+  const int32_t kError_state_time = -1;
 };  // class ActuatorParams
 
 /**
@@ -517,6 +572,8 @@ private:
   std::map<std::string, ActuatorParams> actuator_map_;
   std::shared_ptr<ControllerParams> controller_params_ptr_;
   static std::string config_file_;
+  const int32_t kError_state_time = -1;
+  const char * kMachineServiceName = "machine_service";
 };  // class MachineController
 
 /**
@@ -681,6 +738,7 @@ private:
   rclcpp::Node::SharedPtr node_ptr_ {nullptr};
   rclcpp::Service<FSMACHINE_SRV_T>::SharedPtr machine_service_ptr_{nullptr};
   std::shared_ptr<ActuatorParams> params_ptr_{nullptr};
+  const char * kMachineServiceName = "machine_service";
 };  // class MachineActuator
 }  // namespace machine
 }  // namespace cyberdog
