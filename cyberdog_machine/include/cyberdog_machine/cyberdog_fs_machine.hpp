@@ -415,13 +415,21 @@ public:
     auto response = std::make_shared<FSMACHINE_SRV_T::Response>();
     auto result = iter->second->async_send_request(request);
     auto time_cost = actuator_map_.find(target_actuator)->second.GetTime(target_state);
-    if (rclcpp::spin_until_future_complete(
-        node_ptr_, result,
-        std::chrono::seconds(time_cost)) != rclcpp::FutureReturnCode::SUCCESS)
-    {
+    std::future_status status = result.wait_for(std::chrono::seconds(time_cost));
+    if (status == std::future_status::ready) {
+      INFO("MachineController set actuator:%s state:%s success.",
+        target_actuator.c_str(), target_state.c_str());
+    } else {
       ERROR("MachineController set state failed, get service result failed!");
       return false;
     }
+    // if (rclcpp::spin_until_future_complete(
+    //     node_ptr_, result,
+    //     std::chrono::seconds(time_cost)) != rclcpp::FutureReturnCode::SUCCESS)
+    // {
+    //   ERROR("MachineController set state failed, get service result failed!");
+    //   return false;
+    // }
     if (result.get()->code != static_cast<int32_t>(cyberdog::system::KeyCode::kOK)) {
       ERROR(
         "MachineController set state failed, result code is not OK, expect 0 but actual is: %d.",
