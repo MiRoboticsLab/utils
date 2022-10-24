@@ -415,7 +415,7 @@ public:
     auto response = std::make_shared<FSMACHINE_SRV_T::Response>();
     auto result = iter->second->async_send_request(request);
     auto time_cost = actuator_map_.find(target_actuator)->second.GetTime(target_state);
-    std::future_status status = result.wait_for(std::chrono::seconds(time_cost));
+    std::future_status status = result.wait_for(std::chrono::milliseconds(time_cost));
     if (status == std::future_status::ready) {
       INFO("MachineController set actuator:%s state:%s success.",
         target_actuator.c_str(), target_state.c_str());
