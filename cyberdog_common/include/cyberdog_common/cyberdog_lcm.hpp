@@ -148,7 +148,8 @@ public:
    */
   LcmServer(const std::string & name, std::function<void(const Req &, Res &)> func)
   : request_name_(name + std::string("_request")),
-    response_name_(name + std::string("_response"))
+    response_name_(name + std::string("_response")),
+    exit_(false)
   {
     lcm_ptr_ = std::make_shared<lcm::LCM>(LCM_ADDR);
     callback_ = func;
@@ -167,7 +168,12 @@ public:
    */
   void Spin()
   {
-    while (0 == lcm_ptr_->handle()) {}
+    while (exit_ && 0 == lcm_ptr_->handleTimeout(10)) {}
+  }
+
+  void Exit()
+  {
+    exit_ = true;
   }
 
 public:
@@ -187,6 +193,7 @@ private:
   std::string request_name_ {""};
   std::string response_name_ {""};
   std::function<void(const Req &, Res &)> callback_;
+  bool exit_;
 };  // class LcmServer
 
 }  // namespace common
