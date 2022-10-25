@@ -168,12 +168,18 @@ public:
    */
   void Spin()
   {
-    while (exit_ && 0 == lcm_ptr_->handleTimeout(10)) {}
+    // while (exit_ && 0 == lcm_ptr_->handleTimeout(10)) {}
+    while (0 == lcm_ptr_->handle()) {
+      if (exit_) {
+        break;
+      }
+    }
   }
 
   void Exit()
   {
     exit_ = true;
+    lcm_ptr_ = nullptr;
   }
 
 public:
