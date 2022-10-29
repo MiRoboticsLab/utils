@@ -22,6 +22,7 @@
 #include <condition_variable>
 #include "rclcpp/node.hpp"
 #include "cyberdog_common/cyberdog_json.hpp"
+#include "protocol/msg/heartbeats.hpp"
 
 namespace cyberdog
 {
@@ -41,7 +42,7 @@ struct HeartClick
   }
 
   std::atomic_uint8_t count_ {0};
-};  // struct HeartQueue
+};  // struct HeartClick
 
 /**
  * @brief 心跳类，具体参数及定义请参考心跳设计文档：
@@ -235,6 +236,45 @@ private:
   std::mutex exit_mut_;
   std::condition_variable exit_cond_;
 };  // class HeartBeats
+
+class HeartBeatsActuator
+{
+public:
+  HeartBeatsActuator(std::string name):
+    name_(name)
+  {
+    node_ptr_ = rclcpp::Node::make_shared(name_+"_heartbeat_keep");
+    heartbeats_pub_ = node_ptr_->create_publisher<protocol::msg::Heartbeats>(
+      "manager_heartbeats",
+      rclcpp::SystemDefaultsQoS()
+    );
+    heart_beats_ptr_ = std::make_unique<cyberdog::machine::HeartBeats>(
+      500,
+      std::bind(&HeartBeatsActuator::HeartKeep, this));
+    std::thread(
+      [this]() {
+        rclcpp::spin(node_ptr_);
+      }).detach();
+  }
+public:
+  void HeartBeatRun()
+  {
+    heart_beats_ptr_->HeartRun();
+  }
+private:
+  void HeartKeep()
+  {
+    protocol::msg::Heartbeats msg;
+    // msg.name = "audio";
+    msg.name = name_;
+    heartbeats_pub_->publish(msg);
+  }
+private:
+  std::string name_;
+  rclcpp::Node::SharedPtr node_ptr_ {nullptr};
+  std::unique_ptr<HeartBeats> heart_beats_ptr_;
+  rclcpp::Publisher<protocol::msg::Heartbeats>::SharedPtr heartbeats_pub_;
+};  // class HeartBeatsActuator
 }  // namespace machine
 }  // namespace cyberdog
 
