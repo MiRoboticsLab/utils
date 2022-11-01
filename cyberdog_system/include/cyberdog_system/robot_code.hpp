@@ -93,7 +93,8 @@ enum class KeyCode : int32_t
   kSelfCheckFailed = 9,         // 自检失败
   kParametersInvalid = 10,      // 参数不合法
   kTargetBusy = 11,             // 状态忙碌，用于独占性调用目标
-  kDeviceError = 12             // 硬件错误， 外设、传感器类使用
+  kDeviceError = 12,            // 硬件错误， 外设、传感器类使用
+  kProtectedError = 13          // 低电量保护模式
 };  // enum class KeyCode
 
 /**
