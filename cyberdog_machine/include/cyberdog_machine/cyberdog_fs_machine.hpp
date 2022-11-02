@@ -417,7 +417,7 @@ public:
     auto time_cost = actuator_map_.find(target_actuator)->second.GetTime(target_state);
     std::future_status status = result.wait_for(std::chrono::milliseconds(time_cost));
     if (status == std::future_status::ready) {
-      INFO("MachineController set actuator:%s state:%s success.",
+      INFO("MachineController wait service actuator:%s state:%s ok.",
         target_actuator.c_str(), target_state.c_str());
     } else {
       ERROR("MachineController set state failed, get service result failed!");
@@ -699,12 +699,15 @@ private:
   {
     INFO("MachineActuator service setup on call.");
     std::string service_name = name_ + std::string(kMachineServiceName);
+    machine_callback_group_ =
+      node_ptr_->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     machine_service_ptr_ =
       node_ptr_->create_service<FSMACHINE_SRV_T>(
       service_name,
       std::bind(
         &MachineActuator::ServiceCallback, this, std::placeholders::_1,
-        std::placeholders::_2));
+        std::placeholders::_2),
+      rmw_qos_profile_services_default, machine_callback_group_);
   }
 
   void ServiceCallback(
@@ -735,8 +738,9 @@ private:
       ERROR("MachineActuator checkout state: %s failed, has no such callback.", state.c_str());
       return static_cast<int32_t>(system::KeyCode::kUnSupport);
     } else {
-      iter->second();
-      return static_cast<int32_t>(system::KeyCode::kOK);
+      // iter->second();
+      // return static_cast<int32_t>(system::KeyCode::kOK);
+      return iter->second();
     }
   }
 
@@ -744,6 +748,7 @@ private:
   std::string name_;
   std::map<std::string, std::function<int32_t(void)>> state_callback_map_;
   rclcpp::Node::SharedPtr node_ptr_ {nullptr};
+  rclcpp::CallbackGroup::SharedPtr machine_callback_group_;
   rclcpp::Service<FSMACHINE_SRV_T>::SharedPtr machine_service_ptr_{nullptr};
   std::shared_ptr<ActuatorParams> params_ptr_{nullptr};
   const char * kMachineServiceName = "machine_service";
