@@ -19,6 +19,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <functional>
 
 #include "cyberdog_common/cyberdog_log.hpp"
 
@@ -34,8 +35,8 @@ public:
   virtual std::vector<std::string> ListObjects(
     const std::string & bucket_name, const std::string & prefix) = 0;
   virtual bool GetObject(
-    const std::string & bucket_name,
-    const std::string & object_name, const std::string & download_path) = 0;
+    const std::string & bucket_name, const std::string & object_name,
+    const std::string & download_path, std::function<void(double)> progress) = 0;
   virtual std::map<std::string, std::string> GetObjectMetadata(
     const std::string & bucket_name,
     const std::string & object_name) = 0;
@@ -61,10 +62,12 @@ public:
     const std::string & bucket_name, const std::string & prefix = "");
   bool GetObject(
     const std::string & bucket_name,
-    const std::string & object_name, const std::string & download_path);
+    const std::string & object_name, const std::string & download_path,
+    std::function<void(double)> progress = [](double){return;});
   bool GetObject(
     const std::string & bucket_name, const std::string & prefix,
-    const std::string & object_name, const std::string & download_path);
+    const std::string & object_name, const std::string & download_path,
+    std::function<void(double)> progress = [](double){return;});
   std::map<std::string, std::string> GetObjectMetadata(
     const std::string & bucket_name,
     const std::string & object_name);

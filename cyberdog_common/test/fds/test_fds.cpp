@@ -4,6 +4,14 @@
 
 #include "cyberdog_common/cyberdog_fds.hpp"
 
+double persentage;
+
+void callback(double per)
+{
+  persentage = per;
+  std::cout << "progress: " << persentage * 100 << "%" << std::endl;
+}
+
 int main(int argc, char** argv)
 {
   if (argc < 3)
@@ -37,7 +45,7 @@ int main(int argc, char** argv)
   {
     std::cout << obj << std::endl;
   }
-  if (fds_test.GetObject("platform-module", "algo/test-inner/", "nx_mobilenetv2_tsm.trt", "/home/mi/"))  // or fds_test.GetObject("platform-module", "algo/test-inner/nx_mobilenetv2_tsm.trt", "/home/mi/")
+  if (fds_test.GetObject("platform-module", "algo/test-inner/", "nx_mobilenetv2_tsm.trt", "/home/mi/", callback))  // or fds_test.GetObject("platform-module", "algo/test-inner/nx_mobilenetv2_tsm.trt", "/home/mi/")
   {
     std::cout << "Successfully downloaded file!" << std::endl;
     std::cout << "file md5 is " << fds_test.GetObjectMD5("platform-module", "algo/test-inner/", "nx_mobilenetv2_tsm.trt") << std::endl;
