@@ -37,7 +37,7 @@ public:
     const std::string & bucket_name, const std::string & prefix) override;
   bool GetObject(
     const std::string & bucket_name, const std::string & object_name,
-    const std::string & download_path) override;
+    const std::string & download_path, std::function<void(double)> progress) override;
   std::map<std::string, std::string> GetObjectMetadata(
     const std::string & bucket_name,
     const std::string & object_name) override;

@@ -56,7 +56,7 @@ std::vector<std::string> FdsImpl::ListBuckets()
       buckets_name.emplace_back(bucket->name());
     }
     return buckets_name;
-  } catch (galaxy::fds::GalaxyFDSClientException & e) {
+  } catch (std::exception & e) {
     ERROR_STREAM(e.what());
   }
   return std::vector<std::string>();
@@ -90,15 +90,18 @@ std::vector<std::string> FdsImpl::ListObjects(
       }
     }
     return object_names;
-  } catch (galaxy::fds::GalaxyFDSClientException & e) {
+  } catch (std::exception & e) {
     ERROR_STREAM(e.what());
   }
   return std::vector<std::string>();
 }
 
-int copyStream(std::istream & is, std::ostream & os)
+size_t copyStream(
+  std::istream & is, std::ostream & os,
+  size_t full_size = 1, std::function<void(double)> progress = [](double){return;})
 {
-  int bufferSize = 1024;
+  size_t bufferSize = 1024;
+  double full_size_double = static_cast<double>(full_size);
   char * buffer = new char[bufferSize];
   std::streamsize len = 0;
   is.read(buffer, bufferSize);
@@ -106,6 +109,7 @@ int copyStream(std::istream & is, std::ostream & os)
   while (n > 0) {
     len += n;
     os.write(buffer, n);
+    progress(len / full_size_double);
     if (is) {
       is.read(buffer, bufferSize);
       n = is.gcount();
@@ -119,7 +123,7 @@ int copyStream(std::istream & is, std::ostream & os)
 
 bool FdsImpl::GetObject(
   const std::string & bucket_name, const std::string & object_name,
-  const std::string & download_path)
+  const std::string & download_path, std::function<void(double)> progress)
 {
   std::shared_ptr<galaxy::fds::FDSObject> object = getObjectPtr(bucket_name, object_name);
   if (!object) {
@@ -138,7 +142,11 @@ bool FdsImpl::GetObject(
     return false;
   }
   std::istream & is = object->objectContent();
-  copyStream(is, outfile);
+  size_t object_size = object->objectSummary().size();
+  if (!object_size) {
+    object_size = 1;
+  }
+  copyStream(is, outfile, object_size, progress);
   outfile.close();
   return true;
 }
@@ -162,7 +170,7 @@ std::map<std::string, std::string> FdsImpl::GetObjectMetadata(
     }
     WARN("Not able to get Metadata");
     return std::map<std::string, std::string>();
-  } catch (galaxy::fds::GalaxyFDSClientException & e) {
+  } catch (std::exception & e) {
     ERROR_STREAM(e.what());
   }
   return std::map<std::string, std::string>();
@@ -193,7 +201,7 @@ std::shared_ptr<galaxy::fds::FDSObject> FdsImpl::getObjectPtr(
       return nullptr;
     }
     return fds_client_->getObject(bucket_name, object_name);
-  } catch (galaxy::fds::GalaxyFDSClientException & e) {
+  } catch (std::exception & e) {
     ERROR_STREAM(e.what());
   }
   return nullptr;
@@ -235,18 +243,20 @@ std::vector<std::string> CyberdogFDS::ListObjects(
 
 bool CyberdogFDS::GetObject(
   const std::string & bucket_name,
-  const std::string & object_name, const std::string & download_path)
+  const std::string & object_name, const std::string & download_path,
+  std::function<void(double)> progress)
 {
   if (!fds_) {
     ERROR("Please create fds client first");
     return false;
   }
-  return fds_->GetObject(bucket_name, object_name, download_path);
+  return fds_->GetObject(bucket_name, object_name, download_path, progress);
 }
 
 bool CyberdogFDS::GetObject(
   const std::string & bucket_name, const std::string & prefix,
-  const std::string & object_name, const std::string & download_path)
+  const std::string & object_name, const std::string & download_path,
+  std::function<void(double)> progress)
 {
   if (!fds_) {
     ERROR("Please create fds client first");
@@ -258,7 +268,7 @@ bool CyberdogFDS::GetObject(
   } else {
     full_name = prefix + object_name;
   }
-  return fds_->GetObject(bucket_name, full_name, download_path);
+  return fds_->GetObject(bucket_name, full_name, download_path, progress);
 }
 
 std::map<std::string, std::string> CyberdogFDS::GetObjectMetadata(
