@@ -43,6 +43,7 @@ public:
   virtual size_t GetObjectSize(
     const std::string & bucket_name,
     const std::string & object_name) = 0;
+  virtual void StopDownloading() = 0;
 };
 
 class CyberdogFDS
@@ -63,11 +64,11 @@ public:
   bool GetObject(
     const std::string & bucket_name,
     const std::string & object_name, const std::string & download_path,
-    std::function<void(double)> progress = [](double){return;});
+    std::function<void(double)> progress = [](double) {return;});
   bool GetObject(
     const std::string & bucket_name, const std::string & prefix,
     const std::string & object_name, const std::string & download_path,
-    std::function<void(double)> progress = [](double){return;});
+    std::function<void(double)> progress = [](double) {return;});
   std::map<std::string, std::string> GetObjectMetadata(
     const std::string & bucket_name,
     const std::string & object_name);
@@ -90,6 +91,10 @@ public:
   size_t GetObjectSize(
     const std::string & bucket_name,
     const std::string & prefix, const std::string & object_name);
+  void StopDownloading()
+  {
+    fds_->StopDownloading();
+  }
 
 private:
   std::unique_ptr<FdsInterface> fds_;

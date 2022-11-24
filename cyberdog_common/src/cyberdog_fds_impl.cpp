@@ -98,15 +98,19 @@ std::vector<std::string> FdsImpl::ListObjects(
 
 size_t copyStream(
   std::istream & is, std::ostream & os,
-  size_t full_size = 1, std::function<void(double)> progress = [](double){return;})
+  size_t full_size = 1, std::function<void(double)> progress = [](double) {return;},
+  std::atomic_bool * status_mark = nullptr)
 {
+  if (status_mark) {
+    *status_mark = true;
+  }
   size_t bufferSize = 1024;
   double full_size_double = static_cast<double>(full_size);
   char * buffer = new char[bufferSize];
   std::streamsize len = 0;
   is.read(buffer, bufferSize);
   std::streamsize n = is.gcount();
-  while (n > 0) {
+  while (n > 0 && (!status_mark || *status_mark)) {
     len += n;
     os.write(buffer, n);
     progress(len / full_size_double);
@@ -146,7 +150,14 @@ bool FdsImpl::GetObject(
   if (!object_size) {
     object_size = 1;
   }
-  copyStream(is, outfile, object_size, progress);
+  size_t downloaded_size = copyStream(is, outfile, object_size, progress, &downloading_);
+  if (!downloading_ || downloaded_size < object_size) {
+    outfile.close();
+    WARN_STREAM("Downloading of object " << SplitFilename(object_name) << " is interrupted.");
+    remove(std::string(prefix_path + SplitFilename(object_name)).c_str());
+    downloading_ = false;
+    return false;
+  }
   outfile.close();
   return true;
 }
