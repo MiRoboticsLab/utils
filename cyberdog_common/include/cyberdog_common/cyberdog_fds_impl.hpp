@@ -19,6 +19,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <atomic>
 
 #include "/usr/local/include/galaxy_fds_client.h"
 #include "cyberdog_common/cyberdog_fds.hpp"
@@ -44,12 +45,17 @@ public:
   size_t GetObjectSize(
     const std::string & bucket_name,
     const std::string & object_name) override;
+  void StopDownloading() override
+  {
+    downloading_ = false;
+  }
 
 private:
   std::unique_ptr<galaxy::fds::GalaxyFDSClient> fds_client_;
   std::shared_ptr<galaxy::fds::FDSObject> getObjectPtr(
     const std::string & bucket_name,
     const std::string & object_name);
+  std::atomic_bool downloading_ {false};
 
   LOGGER_MINOR_INSTANCE("FdsImpl");
 };

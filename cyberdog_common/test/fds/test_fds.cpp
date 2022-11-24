@@ -1,6 +1,8 @@
+#include <unistd.h>
 #include <string>
 #include <vector>
 #include <iostream>
+#include <thread>
 
 #include "cyberdog_common/cyberdog_fds.hpp"
 
@@ -10,6 +12,13 @@ void callback(double per)
 {
   persentage = per;
   std::cout << "progress: " << persentage * 100 << "%" << std::endl;
+}
+
+void timeout(cyberdog::common::CyberdogFDS* fds)
+{
+  sleep(3);
+  fds->StopDownloading();
+  std::cout << "stop downloading!" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -45,7 +54,8 @@ int main(int argc, char** argv)
   {
     std::cout << obj << std::endl;
   }
-  if (fds_test.GetObject("platform-module", "algo/test-inner/", "nx_mobilenetv2_tsm.trt", "/home/mi/", callback))  // or fds_test.GetObject("platform-module", "algo/test-inner/nx_mobilenetv2_tsm.trt", "/home/mi/")
+  std::thread t1(&timeout, &fds_test);
+  if (fds_test.GetObject("platform-module", "algo/test-inner/", "nx_mobilenetv2_tsm.trt", "/home/mi/", callback))  // or fds_test.GetObject("platform-module", "algo/test-inner/nx_mobilenetv2_tsm.trt", "/home/mi/", callback)
   {
     std::cout << "Successfully downloaded file!" << std::endl;
     std::cout << "file md5 is " << fds_test.GetObjectMD5("platform-module", "algo/test-inner/", "nx_mobilenetv2_tsm.trt") << std::endl;
@@ -54,6 +64,9 @@ int main(int argc, char** argv)
     // or fds_test.GetObjectSize("platform-module", "algo/test-inner/nx_mobilenetv2_tsm.trt")
     std::cout << "file type is " << fds_test.GetObjectType("platform-module", "algo/test-inner/", "nx_mobilenetv2_tsm.trt") << std::endl;
     // or fds_test.GetObjectType("platform-module", "algo/test-inner/nx_mobilenetv2_tsm.trt")
+  } else {
+    std::cout << "failed to download file" << std::endl;
   }
+  t1.join();
   return 0;
 }
