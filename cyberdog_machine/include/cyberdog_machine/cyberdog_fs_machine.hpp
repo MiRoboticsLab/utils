@@ -340,12 +340,24 @@ public:
             iter.first.c_str());
           return false;
         }
-        if (!client_iter->second->wait_for_service(std::chrono::milliseconds(time_cost))) {
-          ERROR("MachineController wait actuator: %s setup failed, timeout!", iter.first.c_str());
-          return false;
+        bool wait_result = false;
+        std::chrono::time_point<std::chrono::system_clock> p = std::chrono::system_clock::now();
+        int64_t ticks_cur = std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count();
+        int64_t ticks_until =  ticks_cur + time_cost;
+        while(ticks_until >= ticks_cur)
+        {
+          if (client_iter->second->wait_for_service(std::chrono::milliseconds(200))) {
+            wait_result = true;
+            break;
+          }
+          std::chrono::time_point<std::chrono::system_clock> p = std::chrono::system_clock::now();
+          ticks_cur = std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count();
         }
-        INFO("MachineController wait actuator: %s setup OK.", iter.first.c_str());
-        return true;
+        if(!wait_result)
+          ERROR("MachineController wait actuator: %s setup failed, timeout!", iter.first.c_str());
+        else
+          INFO("MachineController wait actuator: %s setup OK.", iter.first.c_str());
+        return wait_result;
       });
     if (!result) {
       ERROR("MachineController wait all actuators setup failed, state machine cannot work!");
