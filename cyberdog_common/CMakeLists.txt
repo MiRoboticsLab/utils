@@ -25,19 +25,34 @@ set(dependencies
   xpack
 )
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 add_library(cyberdog_log SHARED
   include/cyberdog_common/cyberdog_log.hpp
   src/cyberdog_log.cpp)
 
 target_include_directories(cyberdog_log PUBLIC
-$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-$<INSTALL_INTERFACE:include>)
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
 target_compile_definitions(cyberdog_log
   PRIVATE "CYBERDOG_LOG_DLL")
 ament_target_dependencies(
   cyberdog_log
   ${dependencies})
 
+add_library(cyberdog_fds SHARED
+  src/cyberdog_fds_impl.cpp)
+target_include_directories(cyberdog_fds PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(
+  cyberdog_fds
+  ${dependencies})
+link_directories(/usr/local/lib)
+target_link_libraries(cyberdog_fds galaxy-fds-sdk-cpp PocoNet PocoNetSSL
+  PocoFoundation PocoJSON crypto)
 
 if(NOT WIN32)
   ament_environment_hooks(
@@ -50,6 +65,15 @@ install(DIRECTORY include/
 install(
   TARGETS cyberdog_log
   EXPORT cyberdog_log
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
+install(
+  TARGETS cyberdog_fds
+  EXPORT cyberdog_fds
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -88,9 +112,50 @@ if(LOCAL_BUILD_TESTING)
     test/lcmtestcs test/structor
     DESTINATION lib/${PROJECT_NAME})
 endif()
+set(LOCAL_BUILD_TESTING2 TRUE)
+if(LOCAL_BUILD_TESTING2)
+  add_executable(test_fds
+    test/fds/test_fds.cpp
+  )
+  target_include_directories(test_fds PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+  target_compile_features(test_fds PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+  ament_target_dependencies(test_fds
+    rclcpp
+  )
+  target_link_libraries(test_fds
+    cyberdog_fds
+    cyberdog_log
+  )
+endif()
+
+set(LOCAL_BUILD_TESTING3 TRUE)
+if(LOCAL_BUILD_TESTING3)
+  find_package(protocol REQUIRED)
+  add_executable(model_test
+    test/model_test/cyberdog_model_test.cpp
+  )
+  target_include_directories(model_test PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+  target_compile_features(model_test PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+  ament_target_dependencies(model_test
+    rclcpp
+    ament_index_cpp
+    protocol
+    std_msgs
+  )
+  target_link_libraries(model_test
+  cyberdog_fds
+  cyberdog_log)
+
+endif()
+
 
 ament_export_include_directories(include)
 ament_export_targets(cyberdog_log HAS_LIBRARY_TARGET)
+ament_export_targets(cyberdog_fds HAS_LIBRARY_TARGET)
 # ament_export_libraries(cyberdog_log)
 ament_export_dependencies(${dependencies})
 ament_package()
