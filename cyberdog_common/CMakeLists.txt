@@ -112,7 +112,7 @@ if(LOCAL_BUILD_TESTING)
     test/lcmtestcs test/structor
     DESTINATION lib/${PROJECT_NAME})
 endif()
-
+set(LOCAL_BUILD_TESTING2 TRUE)
 if(LOCAL_BUILD_TESTING2)
   add_executable(test_fds
     test/fds/test_fds.cpp
@@ -128,6 +128,28 @@ if(LOCAL_BUILD_TESTING2)
     cyberdog_fds
     cyberdog_log
   )
+endif()
+
+set(LOCAL_BUILD_TESTING3 TRUE)
+if(LOCAL_BUILD_TESTING3)
+  find_package(protocol REQUIRED)
+  add_executable(model_test
+    test/model_test/cyberdog_model_test.cpp
+  )
+  target_include_directories(model_test PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+  target_compile_features(model_test PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+  ament_target_dependencies(model_test
+    rclcpp
+    ament_index_cpp
+    protocol
+    std_msgs
+  )
+  target_link_libraries(model_test
+  cyberdog_fds
+  cyberdog_log)
+
 endif()
 
 
