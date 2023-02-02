@@ -69,13 +69,13 @@ class MachineContext
 public:
   std::string Context(MachineState ms)
   {
-    if (state_map_.find(ms) == state_map_.end())
-    {
+    if (state_map_.find(ms) == state_map_.end()) {
       ERROR("set state error! machine state value not exsit!");
       return Unkown_V;
     }
-    return state_map_.at(ms);    
+    return state_map_.at(ms);
   }
+
 private:
   const std::string Uninitialized_V{"Uninitialized"};
   const std::string SetUp_V{"SetUp"};
@@ -100,7 +100,7 @@ private:
     {MachineState::MS_OTA, OTA_V},
     {MachineState::MS_Error, Error_V},
     {MachineState::MS_Unkown, Unkown_V},
-  };  
+  };
 };
 
 /**
@@ -349,21 +349,23 @@ public:
         }
         bool wait_result = false;
         std::chrono::time_point<std::chrono::system_clock> p = std::chrono::system_clock::now();
-        int64_t ticks_cur = std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count();
-        int64_t ticks_until =  ticks_cur + time_cost;
-        while(ticks_until >= ticks_cur)
-        {
+        int64_t ticks_cur =
+        std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count();
+        int64_t ticks_until = ticks_cur + time_cost;
+        while (ticks_until >= ticks_cur) {
           if (client_iter->second->wait_for_service(std::chrono::milliseconds(200))) {
             wait_result = true;
             break;
           }
           std::chrono::time_point<std::chrono::system_clock> p = std::chrono::system_clock::now();
-          ticks_cur = std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count();
+          ticks_cur = std::chrono::duration_cast<std::chrono::milliseconds>(
+            p.time_since_epoch()).count();
         }
-        if(!wait_result)
+        if (!wait_result) {
           ERROR("MachineController wait actuator: %s setup failed, timeout!", iter.first.c_str());
-        else
+        } else {
           INFO("MachineController wait actuator: %s setup OK.", iter.first.c_str());
+        }
         return wait_result;
       });
     if (!result) {
@@ -436,7 +438,8 @@ public:
     auto time_cost = actuator_map_.find(target_actuator)->second.GetTime(target_state);
     std::future_status status = result.wait_for(std::chrono::milliseconds(time_cost));
     if (status == std::future_status::ready) {
-      INFO("MachineController wait service actuator:%s state:%s ok.",
+      INFO(
+        "MachineController wait service actuator:%s state:%s ok.",
         target_actuator.c_str(), target_state.c_str());
     } else {
       ERROR("MachineController set state failed, get service result failed!");
