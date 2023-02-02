@@ -157,6 +157,11 @@ public:
     return default_state_;
   }
 
+  const std::vector<std::string> & GetAllStates()
+  {
+    return states_vec_;
+  }
+
 private:
   std::vector<std::string> actuators_vec_;
   std::vector<std::string> states_vec_;
@@ -285,6 +290,8 @@ public:
       ERROR("FS Machine init failed, build controller failed!");
       return false;
     }
+
+    deserve_state_vec_ = controller_params_ptr_->GetAllStates();
 
     // toml::array actuator_array;
     if (!common::CyberdogToml::Get(controller, "actuators", target_vec_)) {
@@ -477,6 +484,11 @@ public:
     return set_result;
   }
 
+  const std::vector<std::string> & GetNeedAchieveStates()
+  {
+    return deserve_state_vec_;
+  }
+
 private:
   /* Internal API */
   /**
@@ -587,6 +599,7 @@ private:
 private:
   std::vector<std::string> target_vec_;               // 执行器容器
   rclcpp::Node::SharedPtr node_ptr_ {nullptr};        // 节点指针，用于内置进程间Ros通信
+  std::vector<std::string> deserve_state_vec_;        // 待实现的状态机数组
   std::map<std::string, FS_CLINET_T> client_map_;     // 执行器与Ros服务客户端反射
   std::map<std::string, std::string> state_map_;          // 状态机记录字典
   std::map<std::string, ActuatorParams> actuator_map_;
