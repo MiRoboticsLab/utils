@@ -240,10 +240,10 @@ private:
 class HeartBeatsActuator
 {
 public:
-  HeartBeatsActuator(std::string name):
-    name_(name)
+  HeartBeatsActuator(std::string name)
+  : name_(name)
   {
-    node_ptr_ = rclcpp::Node::make_shared(name_+"_heartbeat_keep");
+    node_ptr_ = rclcpp::Node::make_shared(name_ + "_heartbeat_keep");
     heartbeats_pub_ = node_ptr_->create_publisher<protocol::msg::Heartbeats>(
       "manager_heartbeats",
       rclcpp::SystemDefaultsQoS()
@@ -256,11 +256,13 @@ public:
         rclcpp::spin(node_ptr_);
       }).detach();
   }
+
 public:
   void HeartBeatRun()
   {
     heart_beats_ptr_->HeartRun();
   }
+
 private:
   void HeartKeep()
   {
@@ -269,6 +271,7 @@ private:
     msg.name = name_;
     heartbeats_pub_->publish(msg);
   }
+
 private:
   std::string name_;
   rclcpp::Node::SharedPtr node_ptr_ {nullptr};

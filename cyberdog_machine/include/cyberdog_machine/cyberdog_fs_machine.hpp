@@ -69,13 +69,13 @@ class MachineContext
 public:
   std::string Context(MachineState ms)
   {
-    if (state_map_.find(ms) == state_map_.end())
-    {
+    if (state_map_.find(ms) == state_map_.end()) {
       ERROR("set state error! machine state value not exsit!");
       return Unkown_V;
     }
-    return state_map_.at(ms);    
+    return state_map_.at(ms);
   }
+
 private:
   const std::string Uninitialized_V{"Uninitialized"};
   const std::string SetUp_V{"SetUp"};
@@ -100,7 +100,7 @@ private:
     {MachineState::MS_OTA, OTA_V},
     {MachineState::MS_Error, Error_V},
     {MachineState::MS_Unkown, Unkown_V},
-  };  
+  };
 };
 
 /**
@@ -155,6 +155,11 @@ public:
   const std::string & GetDefaultState()
   {
     return default_state_;
+  }
+
+  const std::vector<std::string> & GetAllStates()
+  {
+    return states_vec_;
   }
 
 private:
@@ -286,6 +291,8 @@ public:
       return false;
     }
 
+    deserve_state_vec_ = controller_params_ptr_->GetAllStates();
+
     // toml::array actuator_array;
     if (!common::CyberdogToml::Get(controller, "actuators", target_vec_)) {
       ERROR("FS Machine init failed, parse actuator array failed!");
@@ -342,21 +349,23 @@ public:
         }
         bool wait_result = false;
         std::chrono::time_point<std::chrono::system_clock> p = std::chrono::system_clock::now();
-        int64_t ticks_cur = std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count();
-        int64_t ticks_until =  ticks_cur + time_cost;
-        while(ticks_until >= ticks_cur)
-        {
+        int64_t ticks_cur =
+        std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count();
+        int64_t ticks_until = ticks_cur + time_cost;
+        while (ticks_until >= ticks_cur) {
           if (client_iter->second->wait_for_service(std::chrono::milliseconds(200))) {
             wait_result = true;
             break;
           }
           std::chrono::time_point<std::chrono::system_clock> p = std::chrono::system_clock::now();
-          ticks_cur = std::chrono::duration_cast<std::chrono::milliseconds>(p.time_since_epoch()).count();
+          ticks_cur = std::chrono::duration_cast<std::chrono::milliseconds>(
+            p.time_since_epoch()).count();
         }
-        if(!wait_result)
+        if (!wait_result) {
           ERROR("MachineController wait actuator: %s setup failed, timeout!", iter.first.c_str());
-        else
+        } else {
           INFO("MachineController wait actuator: %s setup OK.", iter.first.c_str());
+        }
         return wait_result;
       });
     if (!result) {
@@ -429,7 +438,8 @@ public:
     auto time_cost = actuator_map_.find(target_actuator)->second.GetTime(target_state);
     std::future_status status = result.wait_for(std::chrono::milliseconds(time_cost));
     if (status == std::future_status::ready) {
-      INFO("MachineController wait service actuator:%s state:%s ok.",
+      INFO(
+        "MachineController wait service actuator:%s state:%s ok.",
         target_actuator.c_str(), target_state.c_str());
     } else {
       ERROR("MachineController set state failed, get service result failed!");
@@ -475,6 +485,11 @@ public:
       });
     INFO("MachineController set state result: %s", set_result == true ? "true" : "false");
     return set_result;
+  }
+
+  const std::vector<std::string> & GetNeedAchieveStates()
+  {
+    return deserve_state_vec_;
   }
 
 private:
@@ -587,6 +602,7 @@ private:
 private:
   std::vector<std::string> target_vec_;               // 执行器容器
   rclcpp::Node::SharedPtr node_ptr_ {nullptr};        // 节点指针，用于内置进程间Ros通信
+  std::vector<std::string> deserve_state_vec_;        // 待实现的状态机数组
   std::map<std::string, FS_CLINET_T> client_map_;     // 执行器与Ros服务客户端反射
   std::map<std::string, std::string> state_map_;          // 状态机记录字典
   std::map<std::string, ActuatorParams> actuator_map_;
