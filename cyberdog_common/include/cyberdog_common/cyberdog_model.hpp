@@ -69,11 +69,14 @@ public:
   {
     INFO("cyberdog_model Constructor");
     this->model_dir = this->prefix_dir + this->func_name + "/" + this->module_name + "/";
+    this->temp_download_path = this->model_dir + "temp" + "/";
     INFO("is_specified_version: %d", static_cast<int>(this->is_specified_version));
     INFO("specified_version: %s", this->specified_version.c_str());
     INFO("module_name: %s", this->module_name.c_str());
     INFO("model_dir: %s", this->model_dir.c_str());
+    INFO("temp_download_path: %s", this->temp_download_path.c_str());
   }
+
 
   ~cyberdog_model()
   {
@@ -104,13 +107,24 @@ public:
       ERROR("md5 check failed");
       return this->result_code;
     }
-    if (!Post_Process()) {
-      ERROR("download post process failed");
-      return this->result_code;
-    }
     INFO("update models fuc over");
     return this->result_code;
   }
+
+  // 判断是否可以加载模型
+  bool Load_Model_Check()
+  {
+    std::string temp_toml_path = this->temp_download_path + "version.toml";
+    if (access(temp_toml_path.c_str(), F_OK) != 0) {
+      INFO("temp toml path %s do not exist!", temp_toml_path.c_str());
+      return false;
+    } else {
+      INFO("temp toml path %s exist!", temp_toml_path.c_str());
+      return true;
+    }
+  }
+
+
   // 判断fds对象是否创建成功，找出models list。
   bool Init()
   {
@@ -131,54 +145,79 @@ public:
     return true;
   }
 
-  bool Find_Local_Model_Version()
+
+  bool Set_Model_Version(std::string & tomlpath, std::string verison)
   {
-    INFO("read model version in toml file");
-    toml::value value;
-    auto local_config_dir = this->model_dir + std::string(
-      "version.toml");
-    if (access(local_config_dir.c_str(), F_OK) != 0) {
-      INFO("%s do not exist!", local_config_dir.c_str());
+    INFO("Set_Model_Version func");
+    INFO("tomlpath: %s", tomlpath.c_str());
+    INFO("verison: %s", verison.c_str());
+    if (access(tomlpath.c_str(), F_OK) != 0) {
+      INFO("%s do not exist!", tomlpath.c_str());
       INFO("create version toml file");
       int shell_code;
       std::string shell_message;
-      bool result = this->Shell("touch " + local_config_dir, shell_code, shell_message);
+      bool result = this->Shell("touch " + tomlpath, shell_code, shell_message);
       if (result == true) {
-        INFO("create version toml file successfully, set version as 1.0");
+        INFO("create version toml file successfully");
       } else {
         this->result_code = static_cast<int32_t>(ModelKeyCode::kShellCmdFailed);
         ERROR("create version toml file failed");
         return false;
       }
-      toml::value value;
-      if (!CyberdogToml::ParseFile(local_config_dir, value)) {
-        this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlParseFailed);
-        ERROR("parse toml file failed");
-        return false;
-      }
-      toml::value temp;
-      if (!CyberdogToml::Set(temp, "version", std::string("1.0"))) {
-        this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlParseFailed);
-        ERROR("set version from toml failed");
-        return false;
-      }
-      if (!CyberdogToml::WriteFile(local_config_dir, temp)) {
-        this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlWriteFailed);
-        ERROR("write toml file failed");
-        return false;
-      }
     }
+    toml::value value;
+    if (!CyberdogToml::ParseFile(tomlpath, value)) {
+      this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlParseFailed);
+      ERROR("parse toml file failed");
+      return false;
+    }
+    toml::value temp;
+    if (!CyberdogToml::Set(temp, "version", verison)) {
+      this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlParseFailed);
+      ERROR("set version from toml failed");
+      return false;
+    }
+    if (!CyberdogToml::WriteFile(tomlpath, temp)) {
+      this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlWriteFailed);
+      ERROR("write toml file failed");
+      return false;
+    }
+    INFO("write version to toml file successfully");
+    return true;
+  }
+
+  bool Get_Model_Version(std::string & tomlpath, std::string & verison)
+  {
+    INFO("Get_Model_Version func ");
+    toml::value value;
     if (!cyberdog::common::CyberdogToml::ParseFile(
-        std::string(local_config_dir), value))
+        std::string(tomlpath), value))
     {
       this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlParseFailed);
       ERROR("fail to parse data from toml");
       return false;
     }
 
-    if (!cyberdog::common::CyberdogToml::Get(value, "version", this->nx_version)) {
+    if (!cyberdog::common::CyberdogToml::Get(value, "version", verison)) {
       this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlGetFailed);
-      ERROR("fail to read key queue_size from toml");
+      ERROR("fail to read key value from toml");
+    }
+    INFO("read key value from toml successfully");
+    return true;
+  }
+
+  bool Find_Local_Model_Version()
+  {
+    INFO("read model version in toml file");
+    auto local_config_dir = this->model_dir + std::string(
+      "version.toml");
+    if (access(local_config_dir.c_str(), F_OK) != 0) {
+      if (!Set_Model_Version(local_config_dir, std::string("1.0"))) {
+        return false;
+      }
+    }
+    if (!Get_Model_Version(local_config_dir, this->nx_version)) {
+      return false;
     }
     INFO("the model version in toml file is %s ", this->nx_version.c_str());
     return true;
@@ -186,9 +225,10 @@ public:
 
   void Timeout()
   {
+    INFO("Timeout thread start !!!");
     std::this_thread::sleep_for(std::chrono::seconds(this->timeout));
     this->fds_.StopDownloading();
-    INFO("t1 thread finish !!!");
+    INFO("Timeout thread finish !!!");
   }
 
   void SetTimeout(int32_t time)
@@ -197,7 +237,7 @@ public:
   }
 
 
-  // 下载制定和路径的模型
+  // 下载模型到指定的路径中
   bool DownloadModels()
   {
     INFO("DownloadModels fuc");
@@ -210,8 +250,6 @@ public:
       "/" + this->download_version + "/";
     INFO("download models from %s in fds", (this->bucket_name + "/" + ftp_model_path).c_str());
     std::vector<std::string> fds_models_list;
-    this->temp_download_path = this->prefix_dir + this->func_name + "/" +
-      this->module_name + "/" + this->download_version + "/";
     if (!Mk_Folder(this->temp_download_path)) {
       ERROR("mk folder error");
       this->result_code = static_cast<int32_t>(ModelKeyCode::kShellCmdFailed);
@@ -248,6 +286,7 @@ public:
     if (t1.joinable()) {
       t1.detach();
     }
+
     return true;
   }
 
@@ -274,31 +313,6 @@ public:
       this->result_code = static_cast<int32_t>(ModelKeyCode::kShellCmdFailed);
       return false;
     }
-    INFO("change model version in toml");
-    auto local_config_dir = this->model_dir + std::string(
-      "/version.toml");
-    if (access(local_config_dir.c_str(), F_OK) != 0) {
-      INFO("%s do not exist!", local_config_dir.c_str());
-      this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlFileNotExist);
-      return false;
-    }
-    toml::value value;
-    if (!CyberdogToml::ParseFile(local_config_dir, value)) {
-      INFO("Parse toml failed");
-      this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlParseFailed);
-      return false;
-    } else {
-      toml::value temp;
-      auto result = CyberdogToml::Set(temp, "version", this->download_version);
-      result = CyberdogToml::WriteFile(local_config_dir, temp);
-      if (result == true) {
-        INFO("change model version successfully");
-      } else {
-        INFO("change model version failed");
-        this->result_code = static_cast<int32_t>(ModelKeyCode::kTomlWriteFailed);
-        return false;
-      }
-    }
     return true;
   }
 
@@ -316,6 +330,13 @@ public:
       }
     }
     INFO("Md5 Check is ok!!!");
+    // 添加toml文件在临时文件夹
+    INFO("write version to toml file");
+    auto temp_toml_dir = this->temp_download_path + std::string(
+      "version.toml");
+    if (!Set_Model_Version(temp_toml_dir, this->download_version)) {
+      return false;
+    }
     return true;
   }
 
@@ -369,6 +390,11 @@ public:
   // 判断是否需要下载和需要下载的模型版本
   bool Prepare_Download()
   {
+    if (Load_Model_Check()) {
+      this->need_download = false;
+      INFO("new models already downloaded into temp path, do not download again");
+      return true;
+    }
     if (this->is_specified_version) {
       if (this->Is_Specified_Version()) {
         this->need_download = false;
@@ -419,21 +445,25 @@ public:
 
   bool Mk_Folder(std::string & path)
   {
-    if (access(path.c_str(), F_OK) != 0) {
-      INFO("%s do not exist!", path.c_str());
-      INFO("mkdir %s", path.c_str());
-      int shell_code;
-      std::string shell_message;
-      bool result = this->Shell("mkdir -p " + path, shell_code, shell_message);
-      if (result != true) {
-        INFO("mkdir failed");
-        return false;
-      } else {
-        INFO("mkdir successfully");
-        return true;
-      }
-    } else {
+    // 如果存在，删除内容后创建
+    int shell_code;
+    std::string shell_message;
+    if (access(path.c_str(), F_OK) == 0) {
       INFO("%s exist!", path.c_str());
+      INFO("rm dir %s", path.c_str());
+      bool result = this->Shell("rm -rf " + path, shell_code, shell_message);
+      if (result != true) {
+        INFO("rm dir %s failed", path.c_str());
+      } else {
+        INFO("rm dir %s successfully", path.c_str());
+      }
+    }
+    bool mkdir_result = this->Shell("mkdir -p " + path, shell_code, shell_message);
+    if (mkdir_result != true) {
+      INFO("mkdir failed");
+      return false;
+    } else {
+      INFO("mkdir successfully");
       return true;
     }
   }

@@ -18,8 +18,8 @@
 #include "rclcpp/rclcpp.hpp"
 
 // #define SPECIAL_VERSION 1
-// #define NEWEST_VERSION 2
-#define SPECIAL_PATH 3
+#define NEWEST_VERSION 2
+// #define SPECIAL_PATH 3
 struct DownloadControl
 {
   bool thread_work;
@@ -90,16 +90,33 @@ class model_test
     if(code ==0){
       INFO("update model from Fds successfully"); 
     }
+    // 添加模型替换判断
+    INFO("Post_Process!!!!!!!!");
+    if(test.Load_Model_Check()){
+      test.Post_Process();
+      INFO("replace and remove temp model prepare load new model");
+    } else {
+      INFO("load old model");
+    }
 #endif
   //最新版本
 #ifdef NEWEST_VERSION
-    std::string name = "face_recognition/age";
+    std::string name = "gesture_action";
     cyberdog::common::cyberdog_model test(name);
     test.SetTimeout(300);
     int32_t code =  test.UpdateModels();
     if(code ==0){
       INFO("update model from Fds successfully"); 
     }
+    // 添加模型替换判断
+    INFO("Post_Process!!!!!!!!");
+    if(test.Load_Model_Check()){
+      test.Post_Process();
+      INFO("replace and remove temp model prepare load new model");
+    } else {
+      INFO("load old model");
+    }
+    
 #endif 
 // 指定下载路径
 #ifdef SPECIAL_PATH
@@ -109,6 +126,14 @@ class model_test
     int32_t code =  test.UpdateModels();
     if(code ==0){
       INFO("update model from Fds successfully"); 
+    }
+    // 添加模型替换判断
+    INFO("Post_Process!!!!!!!!");
+    if(test.Load_Model_Check()){
+      test.Post_Process();
+      INFO("replace and remove temp model prepare load new model");
+    } else {
+      INFO("load old model");
     }
 #endif 
   }
