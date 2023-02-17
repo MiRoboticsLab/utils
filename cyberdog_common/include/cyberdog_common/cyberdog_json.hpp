@@ -482,7 +482,6 @@ public:
       return false;
     }
     if (!doc.HasMember(key) || !doc[key].IsString()) {
-      value = "parse error";
       return false;
     }
 
@@ -652,7 +651,6 @@ public:
       return false;
     }
     if (!val.HasMember(key) || !val[key].IsString()) {
-      value = "parse error";
       return false;
     }
 
