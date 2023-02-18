@@ -414,7 +414,7 @@ public:
    * @return true 略。
    * @return false 如果返回失败，则目标状态为前一个状态，不受影响
    */
-  bool SetState(const std::string & target_actuator, const std::string & target_state)
+  int32_t SetState(const std::string & target_actuator, const std::string & target_state)
   {
     if (!controller_params_ptr_->CheckActuator(target_actuator)) {
       ERROR("SetState failed, target actuator is invalid!");
@@ -456,10 +456,10 @@ public:
       ERROR(
         "MachineController set state failed, result code is not OK, expect 0 but actual is: %d.",
         result.get()->code);
-      return false;
+      return result.get()->code;
     }
     UpdateState(target_actuator, target_state);
-    return true;
+    return 0;
   }
 
   /**
@@ -469,13 +469,16 @@ public:
    * @return true
    * @return false
    */
-  bool SetState(const std::string & target_state)
+  int32_t SetState(const std::string & target_state)
   {
+    int32_t code = 0;
     INFO("MachineController set global state: %s", target_state.c_str());
     auto set_result = std::all_of(
-      target_vec_.cbegin(), target_vec_.cend(), [this, target_state](const std::string & name) {
+      target_vec_.cbegin(), target_vec_.cend(), [this, target_state, &code](
+        const std::string & name) {
         INFO("all of name: %s, target: %s", name.c_str(), target_state.c_str());
-        if (!SetState(name, target_state)) {
+        code = SetState(name, target_state);
+        if (code != 0) {
           ERROR(
             "MachineController set state faild, target: %s, state: %s", name.c_str(),
             target_state.c_str());
@@ -484,7 +487,7 @@ public:
         return true;
       });
     INFO("MachineController set state result: %s", set_result == true ? "true" : "false");
-    return set_result;
+    return code;
   }
 
   const std::vector<std::string> & GetNeedAchieveStates()
