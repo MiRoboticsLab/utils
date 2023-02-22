@@ -226,7 +226,13 @@ public:
   void Timeout()
   {
     INFO("Timeout thread start !!!");
-    std::this_thread::sleep_for(std::chrono::seconds(this->timeout));
+    {
+      std::unique_lock<std::mutex> lock(mut);
+      cond.wait_for(
+        lock, std::chrono::seconds(this->timeout),
+        [&] {return download_finish;});
+      download_finish = false;
+    }
     this->fds_.StopDownloading();
     INFO("Timeout thread finish !!!");
   }
@@ -272,7 +278,7 @@ public:
         this->result_code = static_cast<int32_t>(ModelKeyCode::kDownloadTimeout);
         INFO("result_code is %d", static_cast<int>(this->result_code));
         if (t1.joinable()) {
-          t1.detach();
+          t1.join();
         }
         return false;
       }
@@ -283,8 +289,13 @@ public:
     int stop_time = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::system_clock::now().time_since_epoch()).count();
     INFO("downloaded models need %d ms", stop_time - begin_time);
+    {
+      std::lock_guard<std::mutex> lock(mut);
+      download_finish = true;
+      cond.notify_all();
+    }
     if (t1.joinable()) {
-      t1.detach();
+      t1.join();
     }
 
     return true;
@@ -545,6 +556,9 @@ private:
   std::map<std::string, std::string> md5_map;
   int32_t result_code = 0;
   int32_t timeout = 300;
+  std::mutex mut;
+  std::condition_variable cond;
+  bool download_finish {false};
   LOGGER_MINOR_INSTANCE("cyberdog_model");
 };  //  class cyberdog_model
 }  //  namespace common
