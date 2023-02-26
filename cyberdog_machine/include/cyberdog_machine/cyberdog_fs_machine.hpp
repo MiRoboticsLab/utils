@@ -418,18 +418,18 @@ public:
   {
     if (!controller_params_ptr_->CheckActuator(target_actuator)) {
       ERROR("SetState failed, target actuator is invalid!");
-      return false;
+      return -1;
     }
     if (!controller_params_ptr_->CheckState(target_state)) {
       ERROR("SetState failed, target state is invalid!");
-      return false;
+      return -1;
     }
     auto iter = client_map_.find(target_actuator);
     if (iter == client_map_.end()) {
       ERROR(
         "MachineController set state failed, get target actuator: %s client failed!",
         target_actuator.c_str());
-      return false;
+      return -1;
     }
     auto request = std::make_shared<FSMACHINE_SRV_T::Request>();
     request->target_state = target_state;
@@ -443,7 +443,7 @@ public:
         target_actuator.c_str(), target_state.c_str());
     } else {
       ERROR("MachineController set state failed, get service result failed!");
-      return false;
+      return -1;
     }
     // if (rclcpp::spin_until_future_complete(
     //     node_ptr_, result,
