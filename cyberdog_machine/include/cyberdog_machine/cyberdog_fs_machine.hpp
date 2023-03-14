@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Beijing Xiaomi Mobile Software Co., Ltd. All rights reserved.
+// Copyright (c) 2023 Beijing Xiaomi Mobile Software Co., Ltd. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -414,7 +414,9 @@ public:
    * @return true 略。
    * @return false 如果返回失败，则目标状态为前一个状态，不受影响
    */
-  int32_t SetState(const std::string & target_actuator, const std::string & target_state)
+  int32_t SetState(
+    const std::string & target_actuator, const std::string & target_state,
+    std::map<std::string, int32_t> & state_map)
   {
     if (!controller_params_ptr_->CheckActuator(target_actuator)) {
       ERROR("SetState failed, target actuator is invalid!");
@@ -456,8 +458,10 @@ public:
       ERROR(
         "MachineController set state failed, result code is not OK, expect 0 but actual is: %d.",
         result.get()->code);
+      state_map.insert(std::pair<std::string, int32_t>(target_actuator, result.get()->code));
       return result.get()->code;
     }
+    state_map.insert(std::pair<std::string, int32_t>(target_actuator, 0));
     UpdateState(target_actuator, target_state);
     return 0;
   }
@@ -469,15 +473,15 @@ public:
    * @return true
    * @return false
    */
-  int32_t SetState(const std::string & target_state)
+  int32_t SetState(const std::string & target_state, std::map<std::string, int32_t> & stmap)
   {
     int32_t code = 0;
     INFO("MachineController set global state: %s", target_state.c_str());
     auto set_result = std::all_of(
-      target_vec_.cbegin(), target_vec_.cend(), [this, target_state, &code](
+      target_vec_.cbegin(), target_vec_.cend(), [this, target_state, &code, &stmap](
         const std::string & name) {
         INFO("all of name: %s, target: %s", name.c_str(), target_state.c_str());
-        code = SetState(name, target_state);
+        code = SetState(name, target_state, stmap);
         if (code != 0) {
           ERROR(
             "MachineController set state faild, target: %s, state: %s", name.c_str(),
