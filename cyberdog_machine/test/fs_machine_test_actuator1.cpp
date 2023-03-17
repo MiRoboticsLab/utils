@@ -135,10 +135,13 @@ int main(int argc, char ** argv)
   LOGGER_MAIN_INSTANCE("ActuatorTest1");
   INFO("Running");
   std::shared_ptr<ActuatorDemo> ptr = std::make_shared<ActuatorDemo>("test1");
+  std::thread t([&](){
+    ptr->Spin();
+  });
   if (!ptr->Init()) {
     ERROR("init failed!");
     return -1;
   }
-  ptr->Spin();
+  t.join();
   return 0;
 }

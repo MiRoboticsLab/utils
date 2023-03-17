@@ -98,7 +98,8 @@ public:
     {
       ERROR("Test FS Machine Init failed!");
       return false;
-    } else if (!machine_controller_ptr_->WaitActuatorsSetUp()) {
+    }
+    if (!machine_controller_ptr_->WaitActuatorsSetUp()) {
       ERROR("Test FS Machine Init failed, actuators setup failed!");
       return false;
     } else {
@@ -109,7 +110,7 @@ public:
 
   void Run()
   {
-    if (!machine_controller_ptr_->SetState(SelfCheck_V)) {
+    if (machine_controller_ptr_->SetState(SelfCheck_V, map_result) != 0) {
       ERROR("selfcheck failed, cannot running!");
       return;
     }
@@ -119,15 +120,21 @@ public:
       // 模拟真实执行场景
       counter = counter % 5;
       std::this_thread::sleep_for(std::chrono::seconds(1));
-      machine_controller_ptr_->SetState(state_vec[counter]);
+      machine_controller_ptr_->SetState(state_vec[counter], map_result);
       counter++;
     }
+  }
+
+  void Spin()
+  {
+    rclcpp::spin(this->node_ptr_);
   }
 
 private:
   std::string name_;
   rclcpp::Node::SharedPtr node_ptr_{nullptr};
   std::shared_ptr<cyberdog::machine::MachineController> machine_controller_ptr_ {nullptr};
+  std::map<std::string, int32_t>  map_result;
 };
 
 int main(int argc, char ** argv)
@@ -139,6 +146,10 @@ int main(int argc, char ** argv)
     ERROR("init failed, program will exit with error!");
     return -1;
   }
+  std::thread t([&](){
+    demo_ptr->Spin();
+  });
   demo_ptr->Run();
+  t.join();
   return 0;
 }
