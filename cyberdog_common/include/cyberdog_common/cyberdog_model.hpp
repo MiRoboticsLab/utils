@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Beijing Xiaomi Mobile Software Co., Ltd. All rights reserved.
+// Copyright (c) 2023-2023 Beijing Xiaomi Mobile Software Co., Ltd. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -209,6 +209,21 @@ public:
   bool Find_Local_Model_Version()
   {
     INFO("read model version in toml file");
+    // Determine whether the model storage path exists
+    if (access(this->model_dir.c_str(), F_OK) != 0) {
+      INFO("%s do not exist!", this->model_dir.c_str());
+      INFO("create file dir");
+      int shell_code;
+      std::string shell_message;
+      bool result = this->Shell("mkdir -p " + this->model_dir, shell_code, shell_message);
+      if (result == true) {
+        INFO("create dir %s successfully", this->model_dir.c_str());
+      } else {
+        this->result_code = static_cast<int32_t>(ModelKeyCode::kShellCmdFailed);
+        ERROR("create dir %s failed", this->model_dir.c_str());
+        return false;
+      }
+    }
     auto local_config_dir = this->model_dir + std::string(
       "version.toml");
     if (access(local_config_dir.c_str(), F_OK) != 0) {
