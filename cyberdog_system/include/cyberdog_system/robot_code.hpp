@@ -71,7 +71,9 @@ enum class ModuleCode : int32_t
   kAFT = 5600,
   kOTA = 5700,
   kVisualProgram = 5800,
-  kFace = 5900
+  kFace = 5900,
+  kTrain = 8200,
+  kUnlock = 9000,
 };  // enum class ModuleCode
 
 /**
