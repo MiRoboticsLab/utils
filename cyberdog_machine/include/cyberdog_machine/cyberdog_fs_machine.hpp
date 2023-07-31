@@ -335,7 +335,7 @@ public:
         auto client_iter = this->client_map_.find(iter.first);
         if (client_iter == client_map_.end()) {
           ERROR(
-            "MachineController waot actuator: %s setup failed, maybe has an error while building.",
+            "MachineController wait actuator: %s setup failed, maybe has an error while building.",
             iter.first.c_str());
           return false;
         }
