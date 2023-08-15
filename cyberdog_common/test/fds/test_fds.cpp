@@ -42,8 +42,8 @@ int main(int argc, char** argv)
     return -1;
   }
   std::string account(argv[1]), secret(argv[2]);
-  cyberdog::common::CyberdogFDS fds_test(account, secret, "cnbj2m-fds.api.xiaomi.net");
-  // or cyberdog::common::CyberdogFDS fds_test; fds_test.CreateFdsClient(account, secret, "cnbj2m-fds.api.xiaomi.net");
+  cyberdog::common::CyberdogFDS fds_test(account, secret, "cnbj2m.fds.api.xiaomi.com");
+  // or cyberdog::common::CyberdogFDS fds_test; fds_test.CreateFdsClient(account, secret, "cnbj2m.fds.api.xiaomi.com");
   if (!fds_test.DoesClientExist())
   {
     std::cout << "client creation failed" << std::endl;
