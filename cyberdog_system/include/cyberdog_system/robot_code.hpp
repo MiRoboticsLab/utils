@@ -42,6 +42,7 @@ enum class ModuleCode : int32_t
   kWifi = 1300,
   kBms = 1400,
   kTouch = 1500,
+  kUWB = 1600,
 
 // sensor code
   kSensorManager = 2000,

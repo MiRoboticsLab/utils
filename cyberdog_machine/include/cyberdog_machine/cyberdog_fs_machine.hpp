@@ -482,7 +482,8 @@ public:
         const std::string & name) {
         INFO("all of name: %s, target: %s", name.c_str(), target_state.c_str());
         code = SetState(name, target_state, stmap);
-        if (code != 0) {
+
+        if (code != 0 && target_state != "SelfCheck") {
           ERROR(
             "MachineController set state faild, target: %s, state: %s", name.c_str(),
             target_state.c_str());
