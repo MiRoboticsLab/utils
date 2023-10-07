@@ -335,7 +335,7 @@ public:
         auto client_iter = this->client_map_.find(iter.first);
         if (client_iter == client_map_.end()) {
           ERROR(
-            "MachineController waot actuator: %s setup failed, maybe has an error while building.",
+            "MachineController wait actuator: %s setup failed, maybe has an error while building.",
             iter.first.c_str());
           return false;
         }
@@ -482,7 +482,8 @@ public:
         const std::string & name) {
         INFO("all of name: %s, target: %s", name.c_str(), target_state.c_str());
         code = SetState(name, target_state, stmap);
-        if (code != 0) {
+
+        if (code != 0 && target_state != "SelfCheck") {
           ERROR(
             "MachineController set state faild, target: %s, state: %s", name.c_str(),
             target_state.c_str());
